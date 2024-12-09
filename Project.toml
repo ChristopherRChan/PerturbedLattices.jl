@@ -3,7 +3,21 @@ uuid = "be1d66e0-3718-436c-bdba-d138765fd356"
 authors = ["ChristopherRChan <crenaudchan@gmail.com> and contributors"]
 version = "1.0.0-DEV"
 
+[deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+GeoStats = "dcc97b0b-8ce5-5539-9008-bb190f959ef6"
+GeoStatsProcesses = "aa102bde-5a27-4b0c-b2c1-e7a7dcc4c3e7"
+Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
 [compat]
+CairoMakie = "0.12.17"
+Distributions = "0.25.113"
+GeoStats = "0.71.5"
+GeoStatsProcesses = "0.8.3"
+Makie = "0.21.17"
+Random = "1.11.0"
 julia = "1.10"
 
 [extras]
