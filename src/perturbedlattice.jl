@@ -6,7 +6,7 @@ end
 
 PerturbedLattice(;δ::Float64=1.0, q::Distribution=Normal(0.1)) = PerturbedLattice(δ, q)
 
-function GeoStatsProcesses.randsingle(rng::AbstractRNG, p::PerturbedLattice, g::Float64) #g=radius of box
-    println(2g)
-    return PointSet([ v + Vec(rand(p.q, 2)...) for v in vertices(CartesianGrid(Int.((2g,2g)),(0,0), (p.δ, p.δ))) ])
+function GeoStatsProcesses.randsingle(rng::AbstractRNG, p::PerturbedLattice, g) #g=radius of box
+    d = length(g)
+    return PointSet([ v + Vec(rand(rng, p.q, d)...) for v in vertices(CartesianGrid(.-(g), g; dims = Int.(2 .* g ./ p.δ))) ])
 end
