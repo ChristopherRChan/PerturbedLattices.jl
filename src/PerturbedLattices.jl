@@ -2,10 +2,10 @@ module PerturbedLattices
 
 using GeoStats, GeoStatsProcesses, Distributions, Random
 
-export GibbsianPerturbedLattice
+export GibbsPerturbedLattice
 export pairwise
-#include("perturbedlattice.jl")
+
 include("interaction.jl")
-include("gibbsianperturbedlattice.jl")
+include("gibbsperturbedlattice.jl")
 
 end
