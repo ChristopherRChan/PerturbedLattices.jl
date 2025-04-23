@@ -5,19 +5,25 @@ version = "1.0.0-DEV"
 
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 GeoStats = "dcc97b0b-8ce5-5539-9008-bb190f959ef6"
 GeoStatsProcesses = "aa102bde-5a27-4b0c-b2c1-e7a7dcc4c3e7"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
+Optim = "429524aa-4258-5aef-a3af-852621145aeb"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 CairoMakie = "0.12.17"
+DataFrames = "1.7.0"
 Distributions = "0.25.113"
 GeoStats = "0.71.5"
 GeoStatsProcesses = "0.8.3"
 Makie = "0.21.17"
+Optim = "1.11.0"
 Random = "1.11.0"
+StatsBase = "0.34.4"
 julia = "1.10"
 
 [extras]
