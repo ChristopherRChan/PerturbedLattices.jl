@@ -1,9 +1,11 @@
 function fit(gpl::GibbsPerturbedLattice, θinit::Float64, νinit::Float64, dataposition::PointSet, dataperturbation::Vector; estimationmethod::Bool=true, optimmethod=NelderMead())
     if estimationmethod
         function  errorfunc(X)
-            -contrast(gpl, X[1], X[2], dataposition, dataperturbation)
+            h = -contrast(gpl, X[1], X[2], dataposition, dataperturbation)
+        println(h)
+        h
         end
-        initial_x =[θinit, νinit]
+        initial_x = [θinit, νinit]
         res = optimize(errorfunc, initial_x, optimmethod)
         Optim.minimizer(res)
     else
@@ -15,7 +17,7 @@ end
 function contrast(gpl::GibbsPerturbedLattice , θ::Float64, ν::Float64, dataposition::PointSet, dataperturbation::Vector)
     qpl = 0
     for (i, _) in enumerate(gpl.grid)
-        qpl = + localenergy([θ], gpl.interactions, i, dataposition[i], dataposition) + ν * g(dataperturbation[i]) + log(quasipartitionfunction(gpl, θ, ν, i, dataposition))
+        qpl += localenergy([θ], gpl.interactions, i, dataposition[i], dataposition) + ν * g(dataperturbation[i]) + log(quasipartitionfunction(gpl, θ, ν, i, dataposition))
     end
     return(qpl)
 end
@@ -34,9 +36,9 @@ end
 function localenergy(θ::Vector{Float64}, interactions::Vector{Interaction}, i::Int64, pt::Point, pts::PointSet)
     h=0 
     for (j, inter) in enumerate(interactions)
-        h =+ θ[j] * localenergy(inter, i, pt, pts)
+        h += θ[j] * localenergy(inter, i, pt, pts)
     end
-    return(h)
+    h
 end
 
 
