@@ -4,7 +4,7 @@ Monte Carlo simulation functions using Metropolis-Hasting algorithm.
 function iterate!(rng::AbstractRNG, pl::PerturbedLatticeModel)
     # Proposal of new point 
     i = rand(rng, 1:length(pl))
-    new_point = pl.grid.points[i] .+ rand(rng, pl.move)
+    new_point = points(lattice(pl))[i] .+ rand(rng, pl.move)
     
     old_adjacency = copy(pl.h.adjacency)
     
@@ -24,7 +24,7 @@ function iterate!(rng::AbstractRNG, pl::PerturbedLatticeModel)
     end
 
     if rand(rng) <= r
-        pl.points[i] = new_point
+        pl.pointset.points[i] = new_point
     else 
         pl.h.adjacency = old_adjacency
     end
@@ -36,4 +36,4 @@ function Random.rand!(rng::AbstractRNG, pl::PerturbedLatticeModel; NMC::Int=1000
     end
 end
 
-Random.rand!(pl::PerturbedLatticeModel; NMC::Int=1000) = rand!(Random.default_rng(), pl; NMC=NMC)
+Random.rand!(pl::PerturbedLatticeModel; NMC::Int=1000) = Random.rand!(Random.default_rng(), pl; NMC=NMC)
