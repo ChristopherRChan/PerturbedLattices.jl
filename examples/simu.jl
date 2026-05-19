@@ -1,19 +1,18 @@
 using PerturbedLattices
 
 
-grid =  Grid(20, 2)
-h = StraussHamiltonian(1.0, 1.3,grid)
-move = GaussianMoveModel([0.5 0.; 0. 0.5], 2)
+h = StraussHamiltonian(1.0, 1.3)
+move = GaussianMoveModel([0.5 0.; 0. 0.5])
 
 # Create the lattice
-pl = PerturbedLatticeModel(h, move, grid)
+pl = PerturbedLatticeModel(h, move, 20, 2)
 
 # Warmup phase
 println("Starting warmup ...")
 @time rand!(pl, NMC=1000)
 
 println("Warmup completed!\n")
-
+points(pl)
 # Plot the point grid connection
 p = plot(pl, [-5.0 5.0; -5.0 5.0])
 display(p)

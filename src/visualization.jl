@@ -1,18 +1,19 @@
 function RecipesBase.plot(pl::PerturbedLatticeModel, Window; arrow=true)
-     if pl.grid.d == 2
-        grid_x = [p[1] for p in pl.grid.points]
-        grid_y = [p[2] for p in pl.grid.points]
-        points_x = [p[1] for p in pl.points]
-        points_y = [p[2] for p in pl.points]
+    lpts, pts = points(lattice(pl)), points(pl)
+    if lattice(pl).d == 2
+        lattice_x = [p[1] for p in lpts]
+        lattice_y = [p[2] for p in lpts]
+        points_x = [p[1] for p in pts]
+        points_y = [p[2] for p in pts]
 
-        p = scatter(grid_x, grid_y, color=:red, markersize=3, label="Grid")
+        p = scatter(lattice_x, lattice_y, color=:red, markersize=3, label="Grid")
 
-        # Add arrows from grid to perturbed points
+        # Add arrows from lattice to perturbed points
         if arrow
-            for i in 1:length(pl.points)
-                quiver!([pl.grid.points[i][1]], [pl.grid.points[i][2]],
-                       quiver=([pl.points[i][1] - pl.grid.points[i][1]],
-                              [pl.points[i][2] - pl.grid.points[i][2]]),
+            for i in 1:length(pts)
+                quiver!([lpts[i][1]], [lpts[i][2]],
+                       quiver=([pts[i][1] - lpts[i][1]],
+                              [pts[i][2] - lpts[i][2]]),
                        color=:gray, alpha=0.3)
             end
         end
@@ -26,26 +27,26 @@ function RecipesBase.plot(pl::PerturbedLatticeModel, Window; arrow=true)
         plot!(aspect_ratio=:equal)
 
         return p
-    elseif pl.grid.d == 3
-        grid_x = [p[1] for p in pl.grid.points]
-        grid_y = [p[2] for p in pl.grid.points]
-        grid_z = [p[3] for p in pl.grid.points]
-        points_x = [p[1] for p in pl.points]
-        points_y = [p[2] for p in pl.points]
-        points_z = [p[3] for p in pl.points]
+    elseif pl.lattice.d == 3
+        lattice_x = [p[1] for p in lpts]
+        lattice_y = [p[2] for p in lpts]
+        lattice_z = [p[3] for p in lpts]
+        points_x = [p[1] for p in pts]
+        points_y = [p[2] for p in pts]
+        points_z = [p[3] for p in pts]
 
         p = plot3d()
 
         # Connection lines
-        for i in 1:length(pl.points)
-            plot3d!([pl.grid.points[i][1], pl.points[i][1]],
-                   [pl.grid.points[i][2], pl.points[i][2]],
-                   [pl.grid.points[i][3], pl.points[i][3]],
+        for i in 1:length(pts)
+            plot3d!([lpts[i][1], pts[i][1]],
+                   [lpts[i][2], pts[i][2]],
+                   [lpts[i][3], pts[i][3]],
                    color=:gray, alpha=0.3, label="", linewidth=0.5)
         end
 
         # Grid points
-        scatter3d!(grid_x, grid_y, grid_z,
+        scatter3d!(lattice_x, lattice_y, lattice_z,
                   color=:red, label="Grid", markersize=2)
 
         # Perturbed points

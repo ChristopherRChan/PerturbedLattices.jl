@@ -10,9 +10,10 @@ using JLD2
 using Infinity
 
 export PerturbedLatticeModel
-export Grid
+export PointSet, Grid
 export StraussHamiltonian, HardCoreHamiltonian
 export GaussianMoveModel, UniformMoveModel
+export lattice, points
 export rand!
 export plot 
 
@@ -27,11 +28,15 @@ export DLR_W, fit
 export plot_points, plot_point_grid_connection
 
 const Point= Vector{Float64}
+
 abstract type AbstractLattice end
+points(l::AbstractLattice) = l.points
+
 abstract type AbstractPerturbedLatticeModel end
 
 # Include submodules
 include("grid.jl")
+include("pointset.jl")
 include("hamiltonian.jl")
 include("move_model.jl")
 #include("estimation.jl")

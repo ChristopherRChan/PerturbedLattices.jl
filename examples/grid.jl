@@ -2,4 +2,6 @@ using PerturbedLattices
 
 grid = Grid(10, 2)
 
-display(grid)
+points(grid)
+
+grid
