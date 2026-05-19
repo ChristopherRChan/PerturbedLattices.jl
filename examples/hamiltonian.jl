@@ -9,4 +9,4 @@ local_energy(h, 1)
 # constructor without lattice at creation
 h2 = StraussHamiltonian(1.0, 1.5)
 # lattice initialized after creation
-PerturbedLattices.lattice!(h2, Grid(20,2))
+PerturbedLattices.pointset!(h2, Grid(20,2))

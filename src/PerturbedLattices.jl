@@ -28,9 +28,10 @@ export DLR_W, fit
 export plot_points, plot_point_grid_connection
 
 const Point= Vector{Float64}
+abstract type AbstractPointSet end # has a field points of type Vector{pointset}
+abstract type AbstractLattice <: AbstractPointSet end
 
-abstract type AbstractLattice end
-points(l::AbstractLattice) = l.points
+points(ps::AbstractPointSet) = ps.points
 
 abstract type AbstractPerturbedLatticeModel end
 

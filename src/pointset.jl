@@ -1,4 +1,4 @@
-mutable struct PointSet 
+mutable struct PointSet <: AbstractPointSet
     lattice::AbstractLattice
     points::Vector{Point}
 end
@@ -12,3 +12,5 @@ end
 points(ps::PointSet) = ps.points
 
 lattice(ps::PointSet) = ps.lattice
+
+dim(ps::PointSet) = ps.lattice.d
