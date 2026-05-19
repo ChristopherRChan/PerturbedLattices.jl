@@ -2,15 +2,16 @@
 Monte Carlo simulation functions using Metropolis-Hasting algorithm. 
 """
 function iterate!(rng::AbstractRNG, pl::PerturbedLatticeModel)
+    sqdist = square_distance(pl.pointset)
+
     # Proposal of new point 
     i = rand(rng, 1:length(pl))
     new_point = points(lattice(pl))[i] .+ rand(rng, pl.move)
     
-    sqdist = square_distance(pl.pointset)
-    old_sqdist_i = copy(sqdist[i,:])
-    
+    # before move
     old_loc_en = local_energy(pl.h, i)
-    update!(pl.pointset, i, new_point)
+    # after move
+    move!(pl, i, new_point)
     new_loc_en = local_energy(pl.h, i)
 
     # Metropolis-Hastings acceptance ratio
@@ -24,16 +25,13 @@ function iterate!(rng::AbstractRNG, pl::PerturbedLatticeModel)
         r = exp(-(new_loc_en - old_loc_en))
     end
 
-    if rand(rng) <= r
-        pl.pointset.points[i] = new_point
-    else 
-        # Slower: pl.h.adjacency = old_adjacency
-        sqdist[i,:] = sqdist[:, i] = old_sqdist_i
+    if rand(rng) > r
+        revert!(pl, i)
     end
 end
 
-function Random.rand!(rng::AbstractRNG, pl::PerturbedLatticeModel; NMC::Int=1000)
-    for i in 1:NMC
+function Random.rand!(rng::AbstractRNG, pl::PerturbedLatticeModel; NMC::Int=10000)
+    for _ in 1:NMC
         iterate!(rng, pl)
     end
 end

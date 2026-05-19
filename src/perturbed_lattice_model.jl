@@ -29,3 +29,7 @@ end
 points(pl::PerturbedLatticeModel) = points(pl.pointset)
 
 lattice(pl::PerturbedLatticeModel) = lattice(pl.pointset)
+
+update!(pl::PerturbedLatticeModel) = update!(pl.pointset)
+move!(pl::PerturbedLatticeModel, i::Int, point::Point) = move!(pl.pointset, i, point)
+revert!(pl::PerturbedLatticeModel, i::Int) = revert!(pl.pointset, i)
