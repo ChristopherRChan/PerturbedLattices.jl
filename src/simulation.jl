@@ -15,16 +15,7 @@ function iterate!(rng::AbstractRNG, pl::PerturbedLatticeModel)
     new_loc_en = local_energy(pl.h, i)
 
     # Metropolis-Hastings acceptance ratio
-    if new_loc_en == Inf && old_loc_en == Inf
-        r = 1.0
-    elseif new_loc_en == Inf
-        r = 0.0
-    elseif old_loc_en == Inf
-        r = 1.0
-    else
-        r = exp(-(new_loc_en - old_loc_en))
-    end
-
+    r = (new_loc_en == Inf && old_loc_en != Inf) ? 0.0 : r = exp(-(new_loc_en - old_loc_en))
     if rand(rng) > r
         revert!(pl, i)
     end

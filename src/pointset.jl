@@ -40,7 +40,7 @@ end
 function revert!(ps::PointSet, i::Int)
    ps.points[i] = ps.old_point
    # revert square distance matrix for ith old point
-   ps.sqdist[i, :] .= ps.sqdist[:, i] .= ps.old_sqdist
+   ps.sqdist[i, :] = ps.sqdist[:, i] = ps.old_sqdist
 end
 
 function square_distance!(ps::PointSet)
