@@ -13,9 +13,9 @@ mutable struct PerturbedLatticeModel <: AbstractPerturbedLatticeModel
     pointset::PointSet
 end
 
-function PerturbedLatticeModel(h::AbstractHamiltonian, move::AbstractMoveModel, radius::Int, d::Int=2)
+function PerturbedLatticeModel(h::AbstractHamiltonian, move::AbstractMoveModel, radius::Int = 20, d::Int=2)
     ps = PointSet(radius, d)
-    lattice!(h, lattice(ps))
+    pointset!(h, ps)
     pl = PerturbedLatticeModel(h, move, ps)
     return pl
 end
@@ -27,4 +27,5 @@ function Base.show(io::IO, pl::PerturbedLatticeModel)
 end
 
 points(pl::PerturbedLatticeModel) = points(pl.pointset)
+
 lattice(pl::PerturbedLatticeModel) = lattice(pl.pointset)

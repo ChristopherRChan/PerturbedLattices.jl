@@ -6,7 +6,8 @@ function iterate!(rng::AbstractRNG, pl::PerturbedLatticeModel)
     i = rand(rng, 1:length(pl))
     new_point = points(lattice(pl))[i] .+ rand(rng, pl.move)
     
-    old_adjacency = copy(pl.h.adjacency)
+    #old_adjacency = copy(pl.h.adjacency)
+    old_adjacency_i = copy(pl.h.adjacency[i,:])
     
     old_loc_en = local_energy(pl.h, i)
     adjacency_matrix!(pl.h, i, new_point)
@@ -26,7 +27,8 @@ function iterate!(rng::AbstractRNG, pl::PerturbedLatticeModel)
     if rand(rng) <= r
         pl.pointset.points[i] = new_point
     else 
-        pl.h.adjacency = old_adjacency
+        # Slower: pl.h.adjacency = old_adjacency
+        pl.h.adjacency[i,:] = pl.h.adjacency[:, i] = old_adjacency_i
     end
 end
 

@@ -23,6 +23,8 @@ function Base.size(g::Grid)
     return tuple(repeat([2*g.radius+1], g.d))
 end
 
+dim(g::Grid) = g.d
+
 function init!(g::Grid)
     l = length(g)
 
