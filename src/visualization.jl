@@ -1,6 +1,6 @@
-function RecipesBase.plot(pl::PerturbedLatticeModel, radius::Float64 = pl.pointset.lattice.radius; arrow=true)
+function RecipesBase.plot(pl::PerturbedLatticeModel; radius::Number = pl.pointset.lattice.radius, arrow=true)
     lpts, pts = points(lattice(pl)), points(pl)
-    window = repeat([-radius radius], pl.pointset.lattice.d)
+    window = repeat(Float64[-radius radius], pl.pointset.lattice.d)
     if lattice(pl).d == 2
         lattice_x = [p[1] for p in lpts]
         lattice_y = [p[2] for p in lpts]

@@ -1,3 +1,7 @@
+## Fx DLR2: Σ_l Σ_i (bn(i,Xi)f_l(i,Xi,Γic ; θ) - ∫bn(i,x)f_l(i,x,Γic ; θ)Λn(i,x,Γic ; θ)dx)^2
+
+# left term is about point config
+# right term is about the inside grid
 
 function create_int_estimation_grid(B::Matrix{Float64}, Nest::Int64)
     x_grid = range(B[1,1], B[1,2], length=Nest)
