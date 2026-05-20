@@ -7,3 +7,6 @@ pl = PerturbedLatticeModel(h, move, 20)
 
 rand!(pl.pointset, move)
 points(pl)
+
+pl[1]
+pl[-10,-10]

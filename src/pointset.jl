@@ -1,12 +1,16 @@
 mutable struct PointSet <: AbstractPointSet
     lattice::AbstractLattice
-    points::Vector{Point}
+    points::Points
     ## used internally
     sqdist::Matrix{Float64}
+    old_sqdist::Vector{Float64}
+    old_point::Point
+    ind::OffsetArray{Int}
 
-    function PointSet(lattice::AbstractLattice, points::Vector{Point})
+    function PointSet(lattice::AbstractLattice, points::Points)
         ps = new(lattice, points)
         ps.sqdist = fill(NaN, length(points), length(points))
+        ps.ind = ps.lattice.ind
         update!(ps)
         return ps
     end
@@ -14,7 +18,8 @@ end
 
 function PointSet(radius::Int, d::Int) # radius et d définissent la fenêtre d'observation
     g = Grid(radius, d)
-    points = deepcopy(g.points) # initalization instead of Vector{Point}(undef, (2*radius+1)^d)
+    points = deepcopy(g.points) # initalization instead of Points(undef, (2*radius+1)^d)
+    
     return PointSet(g, points)
 end
 
@@ -24,24 +29,39 @@ square_distance(ps::PointSet) = ps.sqdist
 
 # Only square distance to update
 update!(ps::PointSet) = square_distance!(ps)
-update!(ps::PointSet, i::Int, point::Point) = square_distance!(ps, i, point)
+
+function move!(ps::PointSet, i::Int, point::Point)
+    # save the distance of old ith point
+    ps.old_sqdist = copy(ps.sqdist[i, :])
+    ps.old_point = copy(ps.points[i])
+    # new point
+    ps.points[i] = point
+    # update square distance matrix for ith point
+    square_distance!(ps, i)
+end
+
+function revert!(ps::PointSet, i::Int)
+   ps.points[i] = ps.old_point
+   # revert square distance matrix for ith old point
+   ps.sqdist[i, :] = ps.sqdist[:, i] = ps.old_sqdist
+end
 
 function square_distance!(ps::PointSet)
     pts = ps.points
     n_pts = length(pts)
     for i in 1:n_pts
         for j in (i+1):n_pts
-            ps.sqdist[i, j] = ps.sqdist[j, i] = sum((pts[i] .- pts[j]).^2)
+            @inbounds ps.sqdist[i, j] = ps.sqdist[j, i] = sum((pts[i] .- pts[j]).^2)
         end
     end
 end
 
-function square_distance!(ps::PointSet, i::Int, point::Point)
+function square_distance!(ps::PointSet, i::Int)
     pts = ps.points
     n_pts = length(pts)
      for j in 1:n_pts
         if j != i
-            ps.sqdist[i, j] = ps.sqdist[j, i] = sum((point .- pts[j]).^2)
+            @inbounds ps.sqdist[i, j] = ps.sqdist[j, i] = sum((pts[i] .- pts[j]).^2)
         end
     end
 end

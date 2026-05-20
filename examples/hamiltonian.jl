@@ -1,6 +1,6 @@
 using PerturbedLattices
 
-h = StraussHamiltonian(1.0, 1.5, Grid(20, 2))
+h = StraussHamiltonian(2.0, 1.5, Grid(20, 2))
 
 hc = HardCoreHamiltonian(0.5, Grid(20, 2))
 h.pointset

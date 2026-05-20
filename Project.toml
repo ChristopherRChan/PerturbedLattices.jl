@@ -1,13 +1,14 @@
 name = "PerturbedLattices"
 uuid = "be1d66e0-3718-436c-bdba-d138765fd356"
-authors = ["ChristopherRChan <crenaudchan@gmail.com> and contributors"]
 version = "1.0.0-DEV"
+authors = ["ChristopherRChan <crenaudchan@gmail.com> and contributors"]
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 Infinity = "a303e19e-6eb4-11e9-3b09-cd9505f79100"
 JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
 Optim = "429524aa-4258-5aef-a3af-852621145aeb"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
@@ -17,6 +18,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Distributions = "0.25"
 Infinity = "0.2"
 JLD2 = "0.4"
+OffsetArrays = "1.17.0"
 Optim = "1.0"
 Plots = "1.0"
 StaticArrays = "1.0"

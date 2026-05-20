@@ -11,6 +11,17 @@ mutable struct PerturbedLatticeModel <: AbstractPerturbedLatticeModel
     h::AbstractHamiltonian
     move::AbstractMoveModel
     pointset::PointSet
+    # internally
+    points::Points
+    ind::OffsetArray{Int}
+
+    function PerturbedLatticeModel(h::AbstractHamiltonian, move::AbstractMoveModel, pointset::PointSet)
+        pl = new(h, move, pointset)
+        ## delegate
+        pl.points = pl.pointset.points
+        pl.ind = pl.pointset.ind
+        return pl
+    end
 end
 
 function PerturbedLatticeModel(h::AbstractHamiltonian, move::AbstractMoveModel, radius::Int = 20, d::Int=2)
@@ -29,3 +40,14 @@ end
 points(pl::PerturbedLatticeModel) = points(pl.pointset)
 
 lattice(pl::PerturbedLatticeModel) = lattice(pl.pointset)
+
+
+update!(pl::PerturbedLatticeModel) = update!(pl.pointset)
+move!(pl::PerturbedLatticeModel, i::Int, point::Point) = move!(pl.pointset, i, point)
+revert!(pl::PerturbedLatticeModel, i::Int) = revert!(pl.pointset, i)
+
+function proposal(rng::AbstractRNG, pl::PerturbedLatticeModel)
+    i = rand(rng, 1:length(pl))
+    return (i, points(lattice(pl))[i] .+ rand(rng, pl.move))
+end
+   
