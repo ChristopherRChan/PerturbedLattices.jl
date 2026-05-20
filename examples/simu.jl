@@ -17,11 +17,11 @@ points(pl)
 pl[-10,10]
 pl[0,0]
 # Plot the point grid connection
-p = plot(pl,20)
+p = plot(pl)
 display(p)
 
 @time rand!(pl, 10)
-plot(pl, 10)
+plot(pl)
 
 
 println("All simulations completed!")
