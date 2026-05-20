@@ -46,8 +46,9 @@ update!(pl::PerturbedLatticeModel) = update!(pl.pointset)
 move!(pl::PerturbedLatticeModel, i::Int, point::Point) = move!(pl.pointset, i, point)
 revert!(pl::PerturbedLatticeModel, i::Int) = revert!(pl.pointset, i)
 
-function proposal(rng::AbstractRNG, pl::PerturbedLatticeModel)
-    i = rand(rng, 1:length(pl))
-    return (i, points(lattice(pl))[i] .+ rand(rng, pl.move))
+function proposal(rng::AbstractRNG, pl::PerturbedLatticeModel; radius::Int=pl.pointset.lattice.radius)
+    ii = rand(rng, -radius:radius, pl.pointset.lattice.d)
+    i = pl.ind[ii...]
+    return (i,lattice(pl)[i] .+ rand(rng, pl.move))
 end
    

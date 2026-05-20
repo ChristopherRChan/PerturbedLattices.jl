@@ -1,5 +1,6 @@
-function RecipesBase.plot(pl::PerturbedLatticeModel, Window; arrow=true)
+function RecipesBase.plot(pl::PerturbedLatticeModel, radius::Float64 = pl.pointset.lattice.radius; arrow=true)
     lpts, pts = points(lattice(pl)), points(pl)
+    window = repeat([-radius radius], pl.pointset.lattice.d)
     if lattice(pl).d == 2
         lattice_x = [p[1] for p in lpts]
         lattice_y = [p[2] for p in lpts]
@@ -20,8 +21,8 @@ function RecipesBase.plot(pl::PerturbedLatticeModel, Window; arrow=true)
 
         scatter!(points_x, points_y,
                 color=:blue, markersize=3, label="Perturbed")
-        xlims!(Window[1,1], Window[1,2])
-        ylims!(Window[2,1], Window[2,2])
+        xlims!(window[1,1], window[1,2])
+        ylims!(window[2,1], window[2,2])
         xlabel!("x")
         ylabel!("y")
         plot!(aspect_ratio=:equal)
@@ -52,9 +53,9 @@ function RecipesBase.plot(pl::PerturbedLatticeModel, Window; arrow=true)
         # Perturbed points
         scatter3d!(points_x, points_y, points_z,
                   color=:blue, label="Perturbed", markersize=2)
-        xlims!(Window[1,1], Window[1,2])
-        ylims!(Window[2,1], Window[2,2])
-        zlims!(Window[3,1], Window[3,2])
+        xlims!(window[1,1], window[1,2])
+        ylims!(window[2,1], window[2,2])
+        zlims!(window[3,1], window[3,2])
         xlabel!("x")
         ylabel!("y")
         zlabel!("z")

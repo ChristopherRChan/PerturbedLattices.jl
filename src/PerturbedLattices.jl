@@ -3,11 +3,8 @@ module PerturbedLattices
 using LinearAlgebra
 using Random
 using Distributions
-using StaticArrays
 using Plots
 using Optim
-using JLD2
-using Infinity
 using OffsetArrays
 
 export PerturbedLatticeModel
@@ -30,7 +27,7 @@ export plot_points, plot_point_grid_connection
 
 const Point = Vector{Float64}
 const Points = Vector{Point}
-const OffsetPoints = OffsetArray{Point}
+# const OffsetPoints = OffsetArray{Point}
 
 abstract type AbstractPoints end # has a field points of type Points and 
 Base.getindex(p::AbstractPoints, i) = Base.getindex(p.points, i)

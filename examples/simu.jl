@@ -8,17 +8,20 @@ move = GaussianMoveModel([0.5 0.; 0. 0.5])
 # Create the lattice
 pl = PerturbedLatticeModel(h, move, 20, 2)
 
-# Warmup phase
+## Warmup phase
 println("Starting warmup ...")
-@time rand!(pl, NMC=100000)
+@time rand!(pl)
 
 println("Warmup completed!\n")
 points(pl)
 pl[-10,10]
 pl[0,0]
 # Plot the point grid connection
-p = plot(pl, [-5.0 5.0; -5.0 5.0])
+p = plot(pl,20)
 display(p)
+
+@time rand!(pl, 10)
+plot(pl, 10)
 
 
 println("All simulations completed!")

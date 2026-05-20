@@ -1,11 +1,11 @@
 """
 Monte Carlo simulation functions using Metropolis-Hasting algorithm. 
 """
-function iterate!(rng::AbstractRNG, pl::PerturbedLatticeModel)
+function iterate!(rng::AbstractRNG, pl::PerturbedLatticeModel, radius::Int=pl.pointset.lattice.radius)
     sqdist = square_distance(pl.pointset)
 
     # Proposal of new point 
-    i, new_point = proposal(rng, pl)
+    i, new_point = proposal(rng, pl; radius=radius)
     # before move
     old_loc_en = local_energy(pl.h, i)
     # after move
@@ -19,10 +19,10 @@ function iterate!(rng::AbstractRNG, pl::PerturbedLatticeModel)
     end
 end
 
-function Random.rand!(rng::AbstractRNG, pl::PerturbedLatticeModel; NMC::Int=10000)
+function Random.rand!(rng::AbstractRNG, pl::PerturbedLatticeModel, radius::Int=pl.pointset.lattice.radius; NMC::Int=10000 )
     for _ in 1:NMC
-        iterate!(rng, pl)
+        iterate!(rng, pl, radius)
     end
 end
 
-Random.rand!(pl::PerturbedLatticeModel; NMC::Int=1000) = Random.rand!(Random.default_rng(), pl; NMC=NMC)
+Random.rand!(pl::PerturbedLatticeModel, radius::Int=pl.pointset.lattice.radius; NMC::Int=10000) = Random.rand!(Random.default_rng(), pl, radius; NMC=NMC)
