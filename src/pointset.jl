@@ -1,14 +1,16 @@
 mutable struct PointSet <: AbstractPointSet
     lattice::AbstractLattice
-    points::Vector{Point}
+    points::Points
     ## used internally
     sqdist::Matrix{Float64}
     old_sqdist::Vector{Float64}
     old_point::Point
+    ind::OffsetArray{Int}
 
-    function PointSet(lattice::AbstractLattice, points::Vector{Point})
+    function PointSet(lattice::AbstractLattice, points::Points)
         ps = new(lattice, points)
         ps.sqdist = fill(NaN, length(points), length(points))
+        ps.ind = ps.lattice.ind
         update!(ps)
         return ps
     end
@@ -16,7 +18,8 @@ end
 
 function PointSet(radius::Int, d::Int) # radius et d définissent la fenêtre d'observation
     g = Grid(radius, d)
-    points = deepcopy(g.points) # initalization instead of Vector{Point}(undef, (2*radius+1)^d)
+    points = deepcopy(g.points) # initalization instead of Points(undef, (2*radius+1)^d)
+    
     return PointSet(g, points)
 end
 

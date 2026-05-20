@@ -14,6 +14,8 @@ println("Starting warmup ...")
 
 println("Warmup completed!\n")
 points(pl)
+pl[-10,10]
+pl[0,0]
 # Plot the point grid connection
 p = plot(pl, [-5.0 5.0; -5.0 5.0])
 display(p)

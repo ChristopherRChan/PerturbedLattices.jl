@@ -1,11 +1,13 @@
 struct Grid <: AbstractLattice
     radius::Int # Domain considered are points on a grid centered and of radius `radius`
     d::Int
-    points::Vector{Point}
+    points::Points
+    ind::OffsetArray{Int}
 
     
-    function Grid(radius::Int, d::Int) 
-        gr = new(radius, d, Vector{Point}(undef, (2*radius+1)^d))
+    function Grid(radius::Int, d::Int)
+        li = OffsetArray{Int}(LinearIndices(tuple(repeat([2radius+1],d)...)), tuple(repeat([-radius:radius],d)...))
+        gr = new(radius, d, Points(undef, (2*radius+1)^d), li)
         init!(gr)
         return gr
     end

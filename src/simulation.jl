@@ -5,9 +5,7 @@ function iterate!(rng::AbstractRNG, pl::PerturbedLatticeModel)
     sqdist = square_distance(pl.pointset)
 
     # Proposal of new point 
-    i = rand(rng, 1:length(pl))
-    new_point = points(lattice(pl))[i] .+ rand(rng, pl.move)
-    
+    i, new_point = proposal(rng, pl)
     # before move
     old_loc_en = local_energy(pl.h, i)
     # after move

@@ -8,6 +8,7 @@ using Plots
 using Optim
 using JLD2
 using Infinity
+using OffsetArrays
 
 export PerturbedLatticeModel
 export PointSet, Grid
@@ -27,13 +28,23 @@ export points_in_window
 export DLR_W, fit
 export plot_points, plot_point_grid_connection
 
-const Point= Vector{Float64}
-abstract type AbstractPointSet end # has a field points of type Vector{pointset}
+const Point = Vector{Float64}
+const Points = Vector{Point}
+const OffsetPoints = OffsetArray{Point}
+
+abstract type AbstractPoints end # has a field points of type Points and 
+Base.getindex(p::AbstractPoints, i) = Base.getindex(p.points, i)
+Base.getindex(p::AbstractPoints, i, j...) = Base.getindex(p.points, p.ind[i, j...])
+Base.setindex!(p::AbstractPoints, v, i) = Base.setindex!(p.points, v, i)
+Base.setindex!(p::AbstractPoints, v, i, j...) = Base.setindex!(p.points, v, p.ind[i, j...])
+
+
+abstract type AbstractPointSet <: AbstractPoints end 
 abstract type AbstractLattice <: AbstractPointSet end
 
-points(ps::AbstractPointSet) = ps.points
+points(ps::AbstractPoints) = ps.points
 
-abstract type AbstractPerturbedLatticeModel end
+abstract type AbstractPerturbedLatticeModel <: AbstractPoints end
 
 # Include submodules
 include("grid.jl")
