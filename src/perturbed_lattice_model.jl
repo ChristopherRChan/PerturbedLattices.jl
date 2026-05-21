@@ -12,8 +12,9 @@ mutable struct PerturbedLatticeModel <: AbstractPerturbedLatticeModel
     move::AbstractMoveModel
     pointset::PointSet
     # internally
-    points::Points
-    ind::OffsetArray{Int}
+    θ::Vector{Float64}      # to keep the current parameters (after estimation) 
+    points::Points          # a pointer to the pointset.points
+    ind::OffsetArray{Int}   # OffsetArray to convert cartesian with negative index to index of point
 
     function PerturbedLatticeModel(h::AbstractHamiltonian, move::AbstractMoveModel, pointset::PointSet)
         pl = new(h, move, pointset)
@@ -38,6 +39,8 @@ function Base.show(io::IO, pl::PerturbedLatticeModel)
 end
 
 points(pl::PerturbedLatticeModel) = points(pl.pointset)
+points!(pl::PerturbedLatticeModel, points::Points) = pl.points = points
+points!(pl::PerturbedLatticeModel, pointset::PointSet) = begin pl.pointset = pointset; pl.points = pointset.points; end
 
 lattice(pl::PerturbedLatticeModel) = lattice(pl.pointset)
 
@@ -51,4 +54,6 @@ function proposal(rng::AbstractRNG, pl::PerturbedLatticeModel; radius::Int=pl.po
     i = pl.ind[ii...]
     return (i,lattice(pl)[i] .+ rand(rng, pl.move))
 end
+
+# function local_energy(pl::PerturbedLatticeModel)
    

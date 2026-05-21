@@ -2,35 +2,58 @@ abstract type AbstractHamiltonian end
 
 dim(h::AbstractHamiltonian) = dim(h.pointset)
 
-mutable struct StraussHamiltonian <: AbstractHamiltonian
-    beta::Float64
-    radius::Float64 
-    # field required for AbstractHamiltonian
-    pointset::AbstractPointSet
-
-    StraussHamiltonian(beta::Float64, radius::Float64) = new(beta, radius)
+struct HamiltonianFamily <: AbstractHamiltonian
+    hs::Vector{AbstractHamiltonian}
 end
 
-function StraussHamiltonian(beta::Float64, radius::Float64, ps::AbstractPointSet)
-    sh = StraussHamiltonian(beta, radius)
+nbparam(h::HamiltonianFamily) = sum([nbparam(h_) for h_=h.hs])
+params(h::HamiltonianFamily) = reduce(vcat, [params(h_) for h_=h.hs])
+function params!(h::HamiltonianFamily, θ::Vector{Float64})
+    inc = 0
+    for h_ in h.hs
+        if nbparam(h) > 0
+            params!(h_, θ[inc+1:inc+nbparam(h_)])
+            inc += nbparam(h_)
+        end
+    end
+end
+
+mutable struct StraussHamiltonian <: AbstractHamiltonian
+    β::Float64
+    ρ::Float64 
+    # field required for AbstractHamiltonian
+    pointset::AbstractPointSet
+    StraussHamiltonian(β::Float64, ρ::Float64) = new(β, ρ)
+end
+
+function StraussHamiltonian(β::Float64, ρ::Float64, ps::AbstractPointSet)
+    sh = StraussHamiltonian(β, ρ)
     pointset!(sh, ps)
     return sh
 end
 
+nbparam(sh::StraussHamiltonian) = 1
+params(sh::StraussHamiltonian) = sh.β
+params!(sh::StraussHamiltonian, β::Float64) = sh.β = β
+params!(sh::StraussHamiltonian, θ::Vector{Float64}) = params!(sh, θ[1])
+
 mutable struct HardCoreHamiltonian <: AbstractHamiltonian
-    radius::Float64
+    ρ::Float64
     # fields required for AbstractHamiltonian
     pointset::AbstractPointSet
 
-    HardCoreHamiltonian(radius::Float64) = new(radius)
+    HardCoreHamiltonian(ρ::Float64) = new(ρ)
     
 end
 
-function HardCoreHamiltonian(radius::Float64, ps::AbstractPointSet)
-    hch = HardCoreHamiltonian(radius)
+function HardCoreHamiltonian(ρ::Float64, ps::AbstractPointSet)
+    hch = HardCoreHamiltonian(ρ)
     pointset!(hch, ps)
     return hch
 end
+
+nbparam(hc::HardCoreHamiltonian) = 0
+params(::HardCoreHamiltonian) = []
 
 function pointset!(sh::StraussHamiltonian, ps::AbstractPointSet)
     sh.pointset = convert(PointSet, ps)
@@ -43,9 +66,9 @@ function pointset!(hch::HardCoreHamiltonian, ps::AbstractPointSet)
 end
 
 
-S(h::StraussHamiltonian, i::Int) = sum(square_distance(h.pointset)[i, :] .<= h.radius^2)
-local_energy(h::StraussHamiltonian, i::Int) = h.beta * S(h,i)
-local_energy(h::HardCoreHamiltonian, i::Int) = any(h.adjacency[i, :] .<= h.radius^2) ? Inf : 0.0
+S(h::StraussHamiltonian, i::Int) = sum(square_distance(h.pointset)[i, :] .<= h.ρ^2)
+local_energy(h::StraussHamiltonian, i::Int) = h.β * S(h,i)
+local_energy(h::HardCoreHamiltonian, i::Int) = any(h.adjacency[i, :] .<= h.ρ^2) ? Inf : 0.0
 
 function ΔS(h::StraussHamiltonian, i::Int, point::Point)
     # before move

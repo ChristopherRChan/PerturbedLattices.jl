@@ -35,7 +35,6 @@ Base.getindex(p::AbstractPoints, i, j...) = Base.getindex(p.points, p.ind[i, j..
 Base.setindex!(p::AbstractPoints, v, i) = Base.setindex!(p.points, v, i)
 Base.setindex!(p::AbstractPoints, v, i, j...) = Base.setindex!(p.points, v, p.ind[i, j...])
 
-
 abstract type AbstractPointSet <: AbstractPoints end 
 abstract type AbstractLattice <: AbstractPointSet end
 
@@ -44,6 +43,7 @@ points(ps::AbstractPoints) = ps.points
 abstract type AbstractPerturbedLatticeModel <: AbstractPoints end
 
 # Include submodules
+include("param.jl")
 include("grid.jl")
 include("pointset.jl")
 include("hamiltonian.jl")
@@ -53,7 +53,7 @@ include("move_model.jl")
 include("perturbed_lattice_model.jl")
 include("simulation.jl")
 include("visualization.jl")
-
+include("estim_takacs_fiksel.jl")
 
 include("v1/perturbedLatticeModel.jl")
 include("v1/grid.jl")

@@ -5,3 +5,6 @@ rand(move)
 
 move2 = UniformMoveModel([[-1.0, 1.0], [-1.0, 1.0]])
 rand(move2)
+
+move = GaussianMoveModel(√0.5, 2)
+rand(move)
