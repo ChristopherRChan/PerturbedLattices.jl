@@ -17,8 +17,7 @@ points(pl)
 pl[-10,10]
 pl[0,0]
 # Plot the point grid connection
-p = plot(pl)
-display(p)
+plot(pl)
 
 @time rand!(pl, 10)
 plot(pl)

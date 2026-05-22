@@ -67,13 +67,21 @@ end
 
 
 S(h::StraussHamiltonian, i::Int) = Σd²(h.pointset, i, h.ρ²)
-energy(h::StraussHamiltonian, i::Int) = h.β * S(h,i)
-energy(h::HardCoreHamiltonian, i::Int) = any(d²(h.pointset)[i, :] .<= h.ρ²) ? Inf : 0.0
+S(h::StraussHamiltonian, i::Int, point::Point) = Σd²(h.pointset, i, point, h.ρ²)
 
-function ΔS(h::StraussHamiltonian, i::Int, point::Point)
-    # before move
-    old_S = S(h, i)
-    # after move
-    move!(h.pointset, i, point)
-    return S(h,i) - old_S
-end
+function localenergy end
+hγ = localenergy
+
+localenergy(h::StraussHamiltonian, i::Int) = h.β * S(h,i)
+localenergy(h::StraussHamiltonian, i::Int, point::Point) = h.β * S(h,i, point)
+
+localenergy(h::HardCoreHamiltonian, i::Int) = any(d²(h.pointset,i) .<= h.ρ²) ? Inf : 0.0
+localenergy(h::HardCoreHamiltonian, i::Int, point::Point) = any(d²(h.pointset, i, point) .<= h.ρ²) ? Inf : 0.0
+
+# function ΔS(h::StraussHamiltonian, i::Int, point::Point)
+#     # before move
+#     old_S = S(h, i)
+#     # after move
+#     move!(h.pointset, i, point)
+#     return S(h,i) - old_S
+# end

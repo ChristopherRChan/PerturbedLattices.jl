@@ -14,7 +14,7 @@ println("Starting warmup ...")
 println("Warmup completed!\n")
 points(pl)
 # Plot the point grid connection
-p = plot(pl, [-5.0 5.0; -5.0 5.0])
+p = plot(pl, radius=5)
 
 PerturbedLattices.d²(pl.pointset)
 

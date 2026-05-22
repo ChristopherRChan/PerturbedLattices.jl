@@ -49,10 +49,10 @@ update!(pl::PerturbedLatticeModel) = update!(pl.pointset)
 
 function move!(pl::AbstractPerturbedLatticeModel, i::Int, point::Point)
     # before move
-    old_en = energy(pl.h, i)
+    old_en = hγ(pl.h, i)
     # after move
     move!(pl.pointset, i, point)
-    new_en = energy(pl.h, i)
+    new_en = hγ(pl.h, i)
     return (new_en == Inf && old_en != Inf) ? 0.0 : exp(-(new_en - old_en))
 end
 

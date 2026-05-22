@@ -25,9 +25,45 @@ end
 
 Base.convert(::Type{PointSet}, g::Grid) = PointSet(g.radius, g.d)
 
+function d²!(ps::PointSet)
+    pts = ps.points
+    n_pts = length(pts)
+    for i in 1:n_pts
+        for j in (i+1):n_pts
+            @inbounds ps.d²[i, j] = ps.d²[j, i] = sum((pts[i] .- pts[j]).^2)
+        end
+    end
+end
+
+function d²!(ps::PointSet, i::Int)
+    pts = ps.points
+    n_pts = length(pts)
+     for j in 1:n_pts
+        if j != i
+            @inbounds ps.d²[i, j] = ps.d²[j, i] = sum((pts[i] .- pts[j]).^2)
+        end
+    end
+end
+
 d²(ps::PointSet) = ps.d²
 d²(ps::PointSet, i::Int) = ps.d²[i,:]
 Σd²(ps::PointSet, i::Int, ρ²::Float64) = sum(d²(ps,i) .<= ρ²)
+
+function d²(ps::PointSet, i::Int, point::Point)
+    pts = ps.points
+    n_pts = length(pts)
+    d²_ = Vector{Float64}(undef, npts - 1)
+    k = 0
+    for j in 1:n_pts
+        if j != i
+            @inbounds d²_[j + k] = sum((point .- pts[j + k]).^2)
+        else
+            k = 1
+        end
+    end
+    return d²_
+end
+Σd²(ps::PointSet, i::Int, point::Point, ρ²::Float64) = sum(d²(ps,i, point) .<= ρ²)
 
 # iₒ is the index of grid point not considered
 d²(ps::PointSet, i::Int, iₒ::Int) = (ps.d²[i,k] for k=eachindex(ps.d²[i,:]) if k ≠ iₒ)
@@ -52,25 +88,6 @@ function revert!(ps::PointSet, i::Int)
    ps.d²[i, :] = ps.d²[:, i] = ps.old_d²
 end
 
-function d²!(ps::PointSet)
-    pts = ps.points
-    n_pts = length(pts)
-    for i in 1:n_pts
-        for j in (i+1):n_pts
-            @inbounds ps.d²[i, j] = ps.d²[j, i] = sum((pts[i] .- pts[j]).^2)
-        end
-    end
-end
-
-function d²!(ps::PointSet, i::Int)
-    pts = ps.points
-    n_pts = length(pts)
-     for j in 1:n_pts
-        if j != i
-            @inbounds ps.d²[i, j] = ps.d²[j, i] = sum((pts[i] .- pts[j]).^2)
-        end
-    end
-end
 
 points(ps::PointSet) = ps.points
 

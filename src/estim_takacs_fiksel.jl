@@ -1,8 +1,8 @@
 ## Takacs-Fiksel: TF(f,Γ;θ) = Σₗ DLRₗ(fₗ,Γ;θ)²
-# DLRₗ(fₗ,Γ;θ) = Σᵢ (bn(i,xᵢ)fₗ(i,xᵢ,Γᵢᶜ ; θ) - ∫bn(i,y)fₗ(i,y,Γ ; θ)Λₙ(i,y,Γ;θ)dy)²
-#.           ≈ Σᵢ {(bn(i,Xᵢ)fₗ(i,xᵢ,Γᵢᶜ ; θ) - Σⱼ fₗ (j,yⱼ,Γ;θ)exp(-θᵀS(j,yⱼ,Γ)) / Σⱼ exp(-θᵀS(j,yⱼ,Γ)
-#  for exponential family:  fₗ(i,xᵢ,Γ ; θ) = Sₗ(i,xᵢ,Γ)
-#            = Σₗ Σᵢ {(bn(i,Xᵢ)Sₗ(i,Xᵢ,Γᵢᶜ) - Σⱼ Sₗ(j,yⱼ,Γ)exp(-ΣₖθₖSₖ(j,yⱼ,Γ)) / Σⱼ exp(-ΣₖθₖSₖ(j,yⱼ,Γ))}
+# DLRₗ(fₗ,Γ;θ) = Σᵢ (bn(i,xᵢ)fₗ(i,xᵢ,Γᵢᶜ ; θ) - ∫bn(i,y)fₗ(i,y,Γᵢᶜ; θ)Λₙ(i,y,Γᵢᶜ;θ)dy)²
+#.           ≈ Σᵢ {(bn(i,Xᵢ)fₗ(i,xᵢ,Γᵢᶜ ; θ) - Σₓ fₗ (i,x,Γᵢᶜ;θ)exp(-θᵀS(i,x,Γᵢᶜ)) / Σₓ exp(-θᵀS(i,xⱼ,Γᵢᶜ)
+#  for exponential family:  fₗ(i,xᵢ,Γᵢᶜ ; θ) = Sₗ(i,xᵢ,Γᵢᶜ)
+#            = Σₗ Σᵢ {(bn(i,Xᵢ)Sₗ(i,Xᵢ,Γᵢᶜ) - Σₓ Sₗ(i,yⱼ,Γ)exp(-ΣₖθₖSₖ(i,xⱼ,Γᵢᶜ)) / Σₓ exp(-ΣₖθₖSₖ(i,xⱼ,Γᵢᶜ))}
 
 
 # left term Σf is about point config
@@ -78,7 +78,7 @@ end
 
 function contrast(tf::TakacsFiksel, θ::Vector{Float64})
     params!(tf, θ)
-    Σf,ΣΣfΛ = Σf_ΣΣfΛ(tf)
+    Σf, ΣΣfΛ = Σf_ΣΣfΛ(tf)
     return sum(((Σf .- ΣΣfΛ).^2))
 end
 
@@ -91,6 +91,6 @@ function tf_fn(m::GaussianMoveModel, i::Int, x::Point, plΓ::PerturbedLatticeMod
     sum((x .- points(plΓ)[i]).^2) / 2
 end
 
-function tf_fn(h::StraussHamiltonian, i::Int, x::Point, plΓ::PerturbedLatticeModel)
-    ΔS(h, i, x)
+function tf_fn(h::StraussHamiltonian, i::Int, x::Point)
+    
 end
