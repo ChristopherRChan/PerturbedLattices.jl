@@ -1,4 +1,9 @@
-## Fx Takacs-Fiksel: Σ_l Σ_i (bn(i,Xi)f_l(i,Xi,Γic ; θ) - ∫bn(i,x)f_l(i,x,Γic ; θ)Λn(i,x,Γic ; θ)dx)^2
+## Takacs-Fiksel: TF(f,Γ;θ) = Σₗ DLRₗ(fₗ,Γ;θ)²
+# DLRₗ(fₗ,Γ;θ) = Σᵢ (bn(i,xᵢ)fₗ(i,xᵢ,Γᵢᶜ ; θ) - ∫bn(i,y)fₗ(i,y,Γ ; θ)Λₙ(i,y,Γ;θ)dy)²
+#.           ≈ Σᵢ {(bn(i,Xᵢ)fₗ(i,xᵢ,Γᵢᶜ ; θ) - Σⱼ fₗ (j,yⱼ,Γ;θ)exp(-θᵀS(j,yⱼ,Γ)) / Σⱼ exp(-θᵀS(j,yⱼ,Γ)
+#  for exponential family:  fₗ(i,xᵢ,Γ ; θ) = Sₗ(i,xᵢ,Γ)
+#            = Σₗ Σᵢ {(bn(i,Xᵢ)Sₗ(i,Xᵢ,Γᵢᶜ) - Σⱼ Sₗ(j,yⱼ,Γ)exp(-ΣₖθₖSₖ(j,yⱼ,Γ)) / Σⱼ exp(-ΣₖθₖSₖ(j,yⱼ,Γ))}
+
 
 # left term ∫f is about point config
 # right term ΣfΛ is about the inside grid
