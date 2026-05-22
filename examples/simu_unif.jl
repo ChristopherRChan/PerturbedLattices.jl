@@ -16,6 +16,6 @@ points(pl)
 # Plot the point grid connection
 p = plot(pl, [-5.0 5.0; -5.0 5.0])
 
-PerturbedLattices.square_distance(pl.pointset)
+PerturbedLattices.d²(pl.pointset)
 
 println("All simulations completed!")

@@ -20,10 +20,10 @@ end
 
 mutable struct StraussHamiltonian <: AbstractHamiltonian
     β::Float64
-    ρ::Float64 
+    ρ²::Float64 
     # field required for AbstractHamiltonian
     pointset::AbstractPointSet
-    StraussHamiltonian(β::Float64, ρ::Float64) = new(β, ρ)
+    StraussHamiltonian(β::Float64, ρ::Float64) = new(β, ρ^2)
 end
 
 function StraussHamiltonian(β::Float64, ρ::Float64, ps::AbstractPointSet)
@@ -38,11 +38,11 @@ params!(sh::StraussHamiltonian, β::Float64) = sh.β = β
 params!(sh::StraussHamiltonian, θ::Vector{Float64}) = params!(sh, θ[1])
 
 mutable struct HardCoreHamiltonian <: AbstractHamiltonian
-    ρ::Float64
+    ρ²::Float64 # square of radius
     # fields required for AbstractHamiltonian
     pointset::AbstractPointSet
 
-    HardCoreHamiltonian(ρ::Float64) = new(ρ)
+    HardCoreHamiltonian(ρ::Float64) = new(ρ^2)
     
 end
 
@@ -66,9 +66,9 @@ function pointset!(hch::HardCoreHamiltonian, ps::AbstractPointSet)
 end
 
 
-S(h::StraussHamiltonian, i::Int) = sum(square_distance(h.pointset)[i, :] .<= h.ρ^2)
-local_energy(h::StraussHamiltonian, i::Int) = h.β * S(h,i)
-local_energy(h::HardCoreHamiltonian, i::Int) = any(h.adjacency[i, :] .<= h.ρ^2) ? Inf : 0.0
+S(h::StraussHamiltonian, i::Int) = Σd²(h.pointset, i, h.ρ²)
+energy(h::StraussHamiltonian, i::Int) = h.β * S(h,i)
+energy(h::HardCoreHamiltonian, i::Int) = any(d²(h.pointset)[i, :] .<= h.ρ²) ? Inf : 0.0
 
 function ΔS(h::StraussHamiltonian, i::Int, point::Point)
     # before move

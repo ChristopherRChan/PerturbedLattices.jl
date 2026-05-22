@@ -45,8 +45,17 @@ points!(pl::PerturbedLatticeModel, pointset::PointSet) = begin pl.pointset = poi
 lattice(pl::PerturbedLatticeModel) = lattice(pl.pointset)
 
 
-update!(pl::PerturbedLatticeModel) = update!(pl.pointset)
-move!(pl::PerturbedLatticeModel, i::Int, point::Point) = move!(pl.pointset, i, point)
+update!(pl::PerturbedLatticeModel) = update!(pl.pointset) 
+
+function move!(pl::AbstractPerturbedLatticeModel, i::Int, point::Point)
+    # before move
+    old_en = energy(pl.h, i)
+    # after move
+    move!(pl.pointset, i, point)
+    new_en = energy(pl.h, i)
+    return (new_en == Inf && old_en != Inf) ? 0.0 : exp(-(new_en - old_en))
+end
+
 revert!(pl::PerturbedLatticeModel, i::Int) = revert!(pl.pointset, i)
 
 function proposal(rng::AbstractRNG, pl::PerturbedLatticeModel; radius::Int=pl.pointset.lattice.radius)

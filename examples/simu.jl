@@ -22,6 +22,6 @@ display(p)
 
 @time rand!(pl, 10)
 plot(pl)
-
+plot(pl, radius=10)
 
 println("All simulations completed!")

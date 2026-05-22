@@ -5,8 +5,8 @@
 #            = Σₗ Σᵢ {(bn(i,Xᵢ)Sₗ(i,Xᵢ,Γᵢᶜ) - Σⱼ Sₗ(j,yⱼ,Γ)exp(-ΣₖθₖSₖ(j,yⱼ,Γ)) / Σⱼ exp(-ΣₖθₖSₖ(j,yⱼ,Γ))}
 
 
-# left term ∫f is about point config
-# right term ΣfΛ is about the inside grid
+# left term Σf is about point config
+# right term ΣΣfΛ is about the inside grid
 
 # default, if hamiltonian or move_model is in TakacsFikselFunctions then it is its default in fns functions
 # keyword arg fns is a way to not use the default tf function of hamiltonian ou move_model
@@ -72,13 +72,14 @@ function update!(tf::TakacsFiksel; fns::Vector{Function}=Function[], radius::Int
     end
 end
 
-function f_ΣfΛ(tf::TakacsFiksel) 
+function Σf_ΣΣfΛ(tf::TakacsFiksel) 
     []
 end
 
 function contrast(tf::TakacsFiksel, θ::Vector{Float64})
     params!(tf, θ)
-    sum(((∫f(tf) .- ΣfΛ(tf)).^2))
+    Σf,ΣΣfΛ = Σf_ΣΣfΛ(tf)
+    return sum(((Σf .- ΣΣfΛ).^2))
 end
 
 function fit(tf::TakacsFiksel, θ::Vector{Float64})
