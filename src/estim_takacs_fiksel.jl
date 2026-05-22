@@ -8,8 +8,8 @@
 # left term Σf is about point config
 # right term ΣΣfΛ is about the inside grid
 
-# default, if hamiltonian or move_model is in TakacsFikselFunctions then it is its default in fns functions
-# keyword arg fns is a way to not use the default tf function of hamiltonian ou move_model
+# default, if hamiltonian or move_model is in TakacsFikselFunctions then it is its default in f functions
+# keyword arg f is a way to not use the default tf function of hamiltonian ou move_model
 
 # 2 schemes:
 # 1. pl is a simulation model
@@ -19,16 +19,16 @@
 mutable struct TakacsFiksel
     pl::PerturbedLatticeModel
     radius::Int                 # radius defining the inside grid compared with radius of pl.pointset
-    fns::Vector{Function}
+    f::Vector{Function}
     # internally
     θ::Vector{Float64}          # final parameters at the end of estimation 
     fcache::Matrix{Float64}     # config cache for left term of DLR
     ΣfΛcache::Matrix{Float64}   # grid cache for right term of DLR
 end
 
-function TakacsFiksel(pl::PerturbedLatticeModel, radius::Int; fns::Vector{Function}=Function[])
+function TakacsFiksel(pl::PerturbedLatticeModel, radius::Int; f::Vector{Function}=Function[])
     θ = zeroes(Float64, nbparam(pl))
-    tf = TakacsFiksel(pl, radius, fns, θ, zeros(0, 0), zeros(0, 0))
+    tf = TakacsFiksel(pl, radius, f, θ, zeros(0, 0), zeros(0, 0))
     init!(tf)
     return tf
 end
@@ -37,22 +37,22 @@ end
 # or define fit(PerturbedLatticeModel, ...) which first define TakacsFiksel object to estimate parameters
 
 function init!(tf::TakacsFiksel) 
-    # int fns
-    tf.fns = Function[]
+    # int f
+    tf.f = Function[]
     if nbparam(tf.pl.move) > 0
-        push!(tf.fns, Base.Fix{1}(tf,tf.pl.move))
+        push!(tf.f, Base.Fix{1}(fₗ,tf.pl.move))
     end
-    hs = tf.pl.h isa HamiltonianFamily ? tf.pl.h.has : [tf.pl.h]
+    hs = tf.pl.h isa HamiltonianFamily ? tf.pl.h.hs : [tf.pl.h]
     for h in hs
        if nbparam(h) > 0
-            push!(tf.fns, Base.Fix{1}(tf,h))
+            push!(tf.f, Base.Fix{1}(fₗ,h))
         end
     end
 
-    # init cache
+    prepare_cache!(tf)
 end
 
-function prepare_cache!(TakacsFiksel)
+function prepare_cache!(tf::TakacsFiksel)
     # left cache
 
 
@@ -60,9 +60,9 @@ function prepare_cache!(TakacsFiksel)
 end
 
 # one global function to update fields 
-function update!(tf::TakacsFiksel; fns::Vector{Function}=Function[], radius::Int=tf.radius)
-    if !isempty(fns)
-        tf.fns = fns
+function update!(tf::TakacsFiksel; f::Vector{Function}=Function[], radius::Int=tf.radius)
+    if !isempty(f)
+        tf.f = f
     end
     if Γ != tf.Γ
         tf.Γ = Γ
@@ -87,10 +87,6 @@ end
 
 # Takacs Fiksel function test for MoveModel and Hamiltonian
 # since Γ is initialized inside plΓ object
-function tf_fn(m::GaussianMoveModel, i::Int, x::Point, plΓ::PerturbedLatticeModel)
-    sum((x .- points(plΓ)[i]).^2) / 2
-end
+fₗ(m::GaussianMoveModel, i::Int, x::Point, plΓ::PerturbedLatticeModel) = sum((x .- points(plΓ)[i]).^2) / 2
 
-function tf_fn(h::StraussHamiltonian, i::Int, x::Point)
-    
-end
+fₗ(h::StraussHamiltonian, i::Int, x::Point) = S(h, i, point)
