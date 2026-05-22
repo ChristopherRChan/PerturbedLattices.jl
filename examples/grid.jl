@@ -10,3 +10,6 @@ grid[1]
 grid[-10,-10]
 
 grid
+
+PerturbedLattices.scale!(grid, .01)
+points(grid)

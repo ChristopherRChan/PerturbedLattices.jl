@@ -52,7 +52,9 @@ function init!(tf::TakacsFiksel)
     prepare_cache!(tf)
 end
 
-function prepare_cache!(tf::TakacsFiksel)
+function prepare_cache!(tf::TakacsFiksel, radius::Float64, scale::Float64)
+    g = Grid(radius, d)
+    scale!(g, scale)
     # left cache
 
 
