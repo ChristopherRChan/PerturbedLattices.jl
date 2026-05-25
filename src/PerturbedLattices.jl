@@ -12,6 +12,7 @@ export PointSet, Grid
 export StraussHamiltonian, HardCoreHamiltonian
 export GaussianMoveModel, UniformMoveModel
 export lattice, points
+export TakacsFiksel
 export rand!
 export plot 
 

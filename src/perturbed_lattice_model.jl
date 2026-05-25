@@ -32,6 +32,8 @@ function PerturbedLatticeModel(h::AbstractHamiltonian, move::AbstractMoveModel, 
     return pl
 end
 
+nbparam(pl::PerturbedLatticeModel) = nbparam(pl.move) + nbparam(pl.h)
+
 Base.length(pl::PerturbedLatticeModel) = length(pl.pointset.lattice)
 
 function Base.show(io::IO, pl::PerturbedLatticeModel)

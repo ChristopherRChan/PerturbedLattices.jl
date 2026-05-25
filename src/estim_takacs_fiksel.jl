@@ -1,7 +1,7 @@
 ## Takacs-Fiksel: TF(f,Γ;θ) = Σₗ DLRₗ(fₗ,Γ;θ)²
 # DLRₗ(fₗ,Γ;θ) = Σᵢ (bn(i,xᵢ)fₗ(i,xᵢ,Γᵢᶜ ; θ) - ∫bn(i,y)fₗ(i,y,Γᵢᶜ; θ)Λₙ(i,y,Γᵢᶜ;θ)dy)²
-#.           ≈ Σᵢ {(bn(i,Xᵢ)fₗ(i,xᵢ,Γᵢᶜ ; θ) - Σₓ fₗ (i,x,Γᵢᶜ;θ)exp(-θᵀS(i,x,Γᵢᶜ)) / Σₓ exp(-θᵀS(i,xⱼ,Γᵢᶜ)
-#  for exponential family:  fₗ(i,xᵢ,Γᵢᶜ ; θ) = Sₗ(i,xᵢ,Γᵢᶜ)
+#            ≈ Σᵢ {(bn(i,Xᵢ)fₗ(i,xᵢ,Γᵢᶜ ; θ) - Σₓ fₗ (i,x,Γᵢᶜ;θ)exp(-θᵀS(i,x,Γᵢᶜ)) / Σₓ exp(-θᵀS(i,xⱼ,Γᵢᶜ)
+# for exponential family:  fₗ(i,xᵢ,Γᵢᶜ ; θ) = Sₗ(i,xᵢ,Γᵢᶜ)
 #            = Σₗ Σᵢ {(bn(i,Xᵢ)Sₗ(i,Xᵢ,Γᵢᶜ) - Σₓ Sₗ(i,yⱼ,Γ)exp(-ΣₖθₖSₖ(i,xⱼ,Γᵢᶜ)) / Σₓ exp(-ΣₖθₖSₖ(i,xⱼ,Γᵢᶜ))}
 
 
@@ -23,12 +23,13 @@ mutable struct TakacsFiksel
     # internally
     θ::Vector{Float64}          # final parameters at the end of estimation 
     fcache::Matrix{Float64}     # config cache for left term of DLR
-    ΣfΛcache::Matrix{Float64}   # grid cache for right term of DLR
+    ΣfΛcache::Array{Float64}   # grid cache for right term of DLR
+    gridQ::Grid
 end
 
-function TakacsFiksel(pl::PerturbedLatticeModel, radius::Int; f::Vector{Function}=Function[])
-    θ = zeroes(Float64, nbparam(pl))
-    tf = TakacsFiksel(pl, radius, f, θ, zeros(0, 0), zeros(0, 0))
+function TakacsFiksel(pl::PerturbedLatticeModel, radius::Int; f::Vector{Function}=Function[], gridQ::Grid=Grid(2,2))
+    θ = zeros(Float64, nbparam(pl))
+    tf = TakacsFiksel(pl, radius, f, θ, zeros(0, 0), zeros(0, 0), gridQ)
     init!(tf)
     return tf
 end
@@ -48,17 +49,35 @@ function init!(tf::TakacsFiksel)
             push!(tf.f, Base.Fix{1}(fₗ,h))
         end
     end
-
-    prepare_cache!(tf)
 end
 
-function prepare_cache!(tf::TakacsFiksel, radius::Float64, scale::Float64)
-    g = Grid(radius, d)
-    scale!(g, scale)
+function cache!(tf::TakacsFiksel; nQ::Int=50, ρQ::Float64=3.0)
+    d = tf.pl.pointset.lattice.d
+    subind = lattice(tf.pl).ind[repeat([-tf.radius:tf.radius],d)...]
+    
     # left cache
-
+    tf.fcache = Matrix{Float64}(undef, length(subind), length(tf.f))
+    pts = points(tf.pl)
+    for (i, si) in enumerate(subind) # si is the index in the subgrid
+        for l in eachindex(length(tf.f))
+            tf.fcache[i, l] = tf.f[l](si, pts[si], tf.pl)
+        end
+    end 
 
     # right cache
+    tf.gridQ = Grid(nQ , d)
+    δ = ρQ / nQ
+    scale!(tf.gridQ, δ)
+    tf.ΣfΛcache = Array{Float64}(undef, length(subind), length(tf.gridQ) ,length(tf.f))
+    lpts = points(lattice(tf.pl))
+    for (i, si) in enumerate(subind)
+        for k in eachindex(points(tf.gridQ))
+            pt = lpts[si] .+ tf.gridQ[k]
+            for l in eachindex(length(tf.f))
+                tf.ΣfΛcache[i, k, l] = tf.f[l](si, pt, tf.pl)
+            end 
+        end
+    end
 end
 
 # one global function to update fields 
@@ -89,6 +108,6 @@ end
 
 # Takacs Fiksel function test for MoveModel and Hamiltonian
 # since Γ is initialized inside plΓ object
-fₗ(m::GaussianMoveModel, i::Int, x::Point, plΓ::PerturbedLatticeModel) = sum((x .- points(plΓ)[i]).^2) / 2
+fₗ(m::GaussianMoveModel, i::Int, x::Point, plΓ::PerturbedLatticeModel) = sum((x .- points(lattice(plΓ))[i]).^2) / 2
 
-fₗ(h::StraussHamiltonian, i::Int, x::Point) = S(h, i, point)
+fₗ(h::StraussHamiltonian, i::Int, x::Point, plΓ::PerturbedLatticeModel) = S(h, i, point)
