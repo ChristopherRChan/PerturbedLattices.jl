@@ -10,11 +10,14 @@ using OffsetArrays
 export PerturbedLatticeModel
 export PointSet, Grid
 export StraussHamiltonian, HardCoreHamiltonian
-export GaussianMoveModel, UniformMoveModel
+export GaussianMove, UniformMove
 export lattice, points
 export TakacsFiksel
 export rand!
 export plot 
+export θ, nθ
+export dim
+export hγ, d²
 
 # Core types
 export PerturbedLatticeV1
@@ -42,13 +45,18 @@ abstract type AbstractLattice <: AbstractPointSet end
 points(ps::AbstractPoints) = ps.points
 
 abstract type AbstractPerturbedLatticeModel <: AbstractPoints end
+abstract type EstimationMethod end
+
+abstract type AbstractHamiltonian end
+abstract type AbstractMove end
 
 # Include submodules
+include("dim.jl")
 include("param.jl")
 include("grid.jl")
 include("pointset.jl")
 include("hamiltonian.jl")
-include("move_model.jl")
+include("move.jl")
 #include("estimation.jl")
 #include("data_creation.jl")
 include("perturbed_lattice_model.jl")

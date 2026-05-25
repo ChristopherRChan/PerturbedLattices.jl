@@ -50,13 +50,13 @@ d²(ps::PointSet, i::Int) = ps.d²[i,:]
 Σd²(ps::PointSet, i::Int, ρ²::Float64) = sum(d²(ps,i) .<= ρ²)
 
 function d²(ps::PointSet, i::Int, point::Point)
-    pts = ps.points
-    n_pts = length(pts)
+    pts = points(ps)
+    npts = length(pts)
     d²_ = Vector{Float64}(undef, npts - 1)
     k = 0
-    for j in 1:n_pts
+    for j in 1:npts
         if j != i
-            @inbounds d²_[j + k] = sum((point .- pts[j + k]).^2)
+            @inbounds d²_[j - k] = sum((point .- pts[j - k]).^2)
         else
             k = 1
         end
@@ -92,5 +92,3 @@ end
 points(ps::PointSet) = ps.points
 
 lattice(ps::PointSet) = ps.lattice
-
-dim(ps::PointSet) = ps.lattice.d

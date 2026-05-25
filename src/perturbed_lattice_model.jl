@@ -9,15 +9,16 @@ A structure for managing perturbed lattice point processes in 2D or 3D.
 
 mutable struct PerturbedLatticeModel <: AbstractPerturbedLatticeModel
     h::AbstractHamiltonian
-    move::AbstractMoveModel
+    move::AbstractMove
     pointset::PointSet
     # internally
     θ::Vector{Float64}      # to keep the current parameters (after estimation) 
     points::Points          # a pointer to the pointset.points
     ind::OffsetArray{Int}   # OffsetArray to convert cartesian with negative index to index of point
 
-    function PerturbedLatticeModel(h::AbstractHamiltonian, move::AbstractMoveModel, pointset::PointSet)
+    function PerturbedLatticeModel(h::AbstractHamiltonian, move::AbstractMove, pointset::PointSet)
         pl = new(h, move, pointset)
+        pl.θ = θ(pl) # at first save parameters of move and hamiltonian  inside internal vector θ
         ## delegate
         pl.points = pl.pointset.points
         pl.ind = pl.pointset.ind
@@ -25,14 +26,25 @@ mutable struct PerturbedLatticeModel <: AbstractPerturbedLatticeModel
     end
 end
 
-function PerturbedLatticeModel(h::AbstractHamiltonian, move::AbstractMoveModel, radius::Int = 20, d::Int=2)
+function PerturbedLatticeModel(h::AbstractHamiltonian, move::AbstractMove, radius::Int = 20, d::Int=2)
     ps = PointSet(radius, d)
     pointset!(h, ps)
     pl = PerturbedLatticeModel(h, move, ps)
     return pl
 end
 
+PerturbedLatticeModel(h::AbstractHamiltonian, move::AbstractMove, grid::Tuple{Int64, Int64}) = PerturbedLatticeModel(h, move, grid[1], grid[2])
+
 nbparam(pl::PerturbedLatticeModel) = nbparam(pl.move) + nbparam(pl.h)
+params(pl::PerturbedLatticeModel) = [params(pl.move); params(pl.h)]
+function params!(pl, θ::Vector{Float64})
+    if nbparam(pl.move) > 0
+        params!(pl.move, θ[1:nbparam(pl.move)])
+    end
+    if nbparam(pl.h) > 0
+        params!(pl.h, θ[1 + nbparam(pl.move):nbparam(pl)])
+    end
+end
 
 Base.length(pl::PerturbedLatticeModel) = length(pl.pointset.lattice)
 

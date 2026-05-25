@@ -2,7 +2,7 @@
 # DLRₗ(fₗ,Γ;θ) = Σᵢ (bn(i,xᵢ)fₗ(i,xᵢ,Γᵢᶜ ; θ) - ∫bn(i,y)fₗ(i,y,Γᵢᶜ; θ)Λₙ(i,y,Γᵢᶜ;θ)dy)²
 #            ≈ Σᵢ {(bn(i,Xᵢ)fₗ(i,xᵢ,Γᵢᶜ ; θ) - Σₓ fₗ (i,x,Γᵢᶜ;θ)exp(-θᵀS(i,x,Γᵢᶜ)) / Σₓ exp(-θᵀS(i,xⱼ,Γᵢᶜ)
 # for exponential family:  fₗ(i,xᵢ,Γᵢᶜ ; θ) = Sₗ(i,xᵢ,Γᵢᶜ)
-#            = Σₗ Σᵢ {(bn(i,Xᵢ)Sₗ(i,Xᵢ,Γᵢᶜ) - Σₓ Sₗ(i,yⱼ,Γ)exp(-ΣₖθₖSₖ(i,xⱼ,Γᵢᶜ)) / Σₓ exp(-ΣₖθₖSₖ(i,xⱼ,Γᵢᶜ))}
+#            = Σₗ Σᵢ {(bn(i,Xᵢ)Sₗ(i,Xᵢ,Γᵢᶜ) - Σₓ Sₗ(i,yⱼ,Γᵢᶜ)exp(-ΣₖθₖSₖ(i,xⱼ,Γᵢᶜ)) / Σₓ exp(-ΣₖθₖSₖ(i,xⱼ,Γᵢᶜ))}
 
 
 # left term Σf is about point config
@@ -16,7 +16,7 @@
 # 2. pl is a model specific to estimation and Γ is its realization from a PointSet supposed to be known (grid structure) eventhough you don't know the link beetwen points and grid points 
 # in bith case pl has to be iitialized before TakacsFiksel object
 
-mutable struct TakacsFiksel
+mutable struct TakacsFiksel <: EstimationMethod
     pl::PerturbedLatticeModel
     radius::Int                 # radius defining the inside grid compared with radius of pl.pointset
     f::Vector{Function}
@@ -51,7 +51,7 @@ function init!(tf::TakacsFiksel)
     end
 end
 
-function cache!(tf::TakacsFiksel; nQ::Int=50, ρQ::Float64=3.0)
+function cache!(tf::TakacsFiksel; nQ::Int=5, ρQ::Float64=1.5)
     d = tf.pl.pointset.lattice.d
     subind = lattice(tf.pl).ind[repeat([-tf.radius:tf.radius],d)...]
     
@@ -59,7 +59,7 @@ function cache!(tf::TakacsFiksel; nQ::Int=50, ρQ::Float64=3.0)
     tf.fcache = Matrix{Float64}(undef, length(subind), length(tf.f))
     pts = points(tf.pl)
     for (i, si) in enumerate(subind) # si is the index in the subgrid
-        for l in eachindex(length(tf.f))
+        for l in eachindex(tf.f)
             tf.fcache[i, l] = tf.f[l](si, pts[si], tf.pl)
         end
     end 
@@ -73,7 +73,7 @@ function cache!(tf::TakacsFiksel; nQ::Int=50, ρQ::Float64=3.0)
     for (i, si) in enumerate(subind)
         for k in eachindex(points(tf.gridQ))
             pt = lpts[si] .+ tf.gridQ[k]
-            for l in eachindex(length(tf.f))
+            for l in eachindex(tf.f)
                 tf.ΣfΛcache[i, k, l] = tf.f[l](si, pt, tf.pl)
             end 
         end
@@ -106,8 +106,8 @@ end
 function fit(tf::TakacsFiksel, θ::Vector{Float64})
 end
 
-# Takacs Fiksel function test for MoveModel and Hamiltonian
+# Takacs Fiksel function test for Move and Hamiltonian
 # since Γ is initialized inside plΓ object
-fₗ(m::GaussianMoveModel, i::Int, x::Point, plΓ::PerturbedLatticeModel) = sum((x .- points(lattice(plΓ))[i]).^2) / 2
+fₗ(m::GaussianMove, i::Int, x::Point, plΓ::PerturbedLatticeModel) = sum((x .- points(lattice(plΓ))[i]).^2) / 2
 
-fₗ(h::StraussHamiltonian, i::Int, x::Point, plΓ::PerturbedLatticeModel) = S(h, i, point)
+fₗ(h::StraussHamiltonian, i::Int, x::Point, plΓ::PerturbedLatticeModel) = S(h, i, x)

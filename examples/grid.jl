@@ -2,6 +2,7 @@ using PerturbedLattices
 
 grid = Grid(10, 2)
 
+dim(grid)
 points(grid)
 
 points(grid)[1]

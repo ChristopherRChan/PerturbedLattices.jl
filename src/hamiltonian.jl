@@ -1,7 +1,3 @@
-abstract type AbstractHamiltonian end
-
-dim(h::AbstractHamiltonian) = dim(h.pointset)
-
 struct HamiltonianFamily <: AbstractHamiltonian
     hs::Vector{AbstractHamiltonian}
 end
@@ -12,7 +8,7 @@ function params!(h::HamiltonianFamily, θ::Vector{Float64})
     inc = 0
     for h_ in h.hs
         if nbparam(h) > 0
-            params!(h_, θ[inc+1:inc+nbparam(h_)])
+            params!(h_, θ[inc + 1:inc+nbparam(h_)])
             inc += nbparam(h_)
         end
     end
@@ -31,6 +27,7 @@ function StraussHamiltonian(β::Float64, ρ::Float64, ps::AbstractPointSet)
     pointset!(sh, ps)
     return sh
 end
+StraussHamiltonian(;β::Float64, ρ::Float64) = StraussHamiltonian(β, ρ)
 
 nbparam(sh::StraussHamiltonian) = 1
 params(sh::StraussHamiltonian) = sh.β
