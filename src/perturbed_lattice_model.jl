@@ -49,7 +49,7 @@ end
 Base.length(pl::PerturbedLatticeModel) = length(pl.pointset.lattice)
 
 function Base.show(io::IO, pl::PerturbedLatticeModel)
-    print(io, "PerturbedLatticeModel  on " * string(pl.pointset.lattice))
+    print(io, "PerturbedLattice(move=" * string(pl.move) * ", h=" * string(pl.h) *  ") on " * string(pl.pointset.lattice))
 end
 
 points(pl::PerturbedLatticeModel) = points(pl.pointset)

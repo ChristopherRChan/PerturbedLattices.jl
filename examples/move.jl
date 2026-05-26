@@ -2,6 +2,7 @@ using PerturbedLattices
 
 move = GaussianMove([0.5 0.; 0. 0.5])
 dim(move)
+θ(move)
 rand(move)
 
 move2 = UniformMove([[-1.0, 1.0], [-1.0, 1.0]])

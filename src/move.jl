@@ -14,7 +14,7 @@ GaussianMove(σ²::Float64, d::Int) = GaussianMove(diagm(repeat([σ²],d)))
 GaussianMove(;σ²::Float64=1.0, d::Int=2) = GaussianMove(σ², d)
 
 function Base.show(io::IO, m::GaussianMove)
-    print(io, "GaussianMove(σ²=$(θ(m)[1]), d=$(m.d))")
+    print(io, "Gaussian(σ²=$(m.Σ[1,1]), d=$(m.d))")
 end
 
 # param is 1/σ² = σ⁻²
@@ -40,7 +40,7 @@ mutable struct UniformMove <: AbstractMove
 end
 
 function Base.show(io::IO, m::UniformMove)
-    print(io, "UniformMove([$(m.bounds[1][1]), $(m.bounds[1][2])]×[$(m.bounds[2][1]), $(m.bounds[2][2])]")
+    print(io, "Uniform([$(m.bounds[1][1]), $(m.bounds[1][2])]×[$(m.bounds[2][1]), $(m.bounds[2][2])]")
 end
 
 nbparam(m::UniformMove) = 0

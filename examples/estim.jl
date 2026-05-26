@@ -21,26 +21,28 @@ points(tf)
 θ!(tf, tf.pl.θ)
 θ(tf)
 PerturbedLattices.contrast(tf)
-PerturbedLattices.contrast(tf, [1.0, 0.01])
-fit!(tf)
+PerturbedLattices.contrast(tf, tf.pl.θ)
+fit!(tf, [1.0, 2.])
+PerturbedLattices.contrast(tf)
 tf.fcache
 tf.ΣfΛcache
 tf.ΣfΛcache[1, : , :]
 lattice(tf.pl).ind[841]
 θ(tf)
+transpose(fill(1.0, length(tf.subind))) * 
+    (
+        tf.fcache -  [ sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , l]) ./ sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)))  for i=eachindex(tf.subind), l=eachindex(tf.f) ]
+    ) / length(tf.subind)
 
-# left
-tf.fcache
-# right
-transpose(fill(1.0, length(tf.gridQ))) * exp.(-tf.ΣfΛcache[1, : , :]  * θ(tf))
-sum(exp.(-tf.ΣfΛcache[1, : , :]  * θ(tf)))
-exp.(-tf.ΣfΛcache[1, : , :]  * θ(tf)) .* tf.ΣfΛcache[1, : , :]
-collect(transpose(fill(1.0, length(tf.gridQ))) * (exp.(-tf.ΣfΛcache[1, : , :]  * θ(tf)) .* tf.ΣfΛcache[1, : , :]) / sum(exp.(-tf.ΣfΛcache[1, : , :]  * θ(tf))))
-
-
-vcat([collect(transpose(fill(1.0, length(tf.gridQ))) * (exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , :]) / sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)))) for i=eachindex(tf.subind)]...)
-
-sum(transpose(fill(1.0, length(tf.subind))) * (tf.fcache - vcat([collect(transpose(fill(1.0, length(tf.gridQ))) * (exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , :]) / sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)))) for i=eachindex(tf.subind)]...)) .^2)
+sum(
+    (
+        transpose(fill(1.0, length(tf.subind))) * 
+        (
+            tf.fcache - 
+            vcat( [collect(transpose(fill(1.0, length(tf.gridQ))) * (exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , :]) / sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf))))  for i=eachindex(tf.subind) ]...)
+        ) / length(tf.subind)
+    ) .^2
+)
 
 #################################################
 ### Devel of TakacsFiksel

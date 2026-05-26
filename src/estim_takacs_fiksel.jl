@@ -107,14 +107,14 @@ function Σf_ΣΣfΛ(tf::TakacsFiksel)
 end
 
 contrast(tf::TakacsFiksel) = sum(
-        (
-            transpose(fill(1.0, length(tf.subind))) * 
+    (
+        transpose(fill(1.0, length(tf.subind))) * 
             (
-                tf.fcache - 
-                vcat([collect(transpose(fill(1.0, length(tf.gridQ))) * (exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , :]) / sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf))))  for i=eachindex(tf.subind)]...)
+                tf.fcache -  
+                    [ sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , l]) ./ sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)))  for i=eachindex(tf.subind), l=eachindex(tf.f) ]
             ) / length(tf.subind)
-        ) .^2
-    )
+    ) .^2
+)
 
 function contrast(tf::TakacsFiksel, θ::Vector{Float64})
     θ!(tf, θ)
@@ -122,9 +122,10 @@ function contrast(tf::TakacsFiksel, θ::Vector{Float64})
 end
 
 function fit!(tf::TakacsFiksel, θ₀::Vector{Float64} = θ(tf))
-     result = optimize(Base.Fix{1}(contrast, tf), θ₀, NelderMead())
-
-    minimizer = Optim.minimizer(result)
+    θ!(tf, θ₀) 
+    result = optimize(Base.Fix{1}(contrast, tf), θ₀, NelderMead())
+    tf.θ = Optim.minimizer(result)
+    result
 end
 
 # Takacs Fiksel function test for Move and Hamiltonian

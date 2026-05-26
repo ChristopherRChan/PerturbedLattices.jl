@@ -27,7 +27,10 @@ function StraussHamiltonian(β::Float64, ρ::Float64, ps::AbstractPointSet)
     pointset!(sh, ps)
     return sh
 end
+
 StraussHamiltonian(;β::Float64, ρ::Float64) = StraussHamiltonian(β, ρ)
+
+Base.show(io::IO, sh::StraussHamiltonian) = print(io, "Strauss(β=$(sh.β), ρ²=$(sh.ρ²)")
 
 nbparam(sh::StraussHamiltonian) = 1
 params(sh::StraussHamiltonian) = sh.β
