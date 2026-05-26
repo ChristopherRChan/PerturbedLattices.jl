@@ -42,6 +42,8 @@ function TakacsFiksel(pl::PerturbedLatticeModel, radius::Int; f::Vector{Function
     return tf
 end
 
+Base.show(io::IO, tf::TakacsFiksel) = print(io, "TakacsFiksel(Γ=$(tf.pl))")
+
 nbparam(tf::TakacsFiksel) = nbparam(tf.pl)
 params(tf::TakacsFiksel) = params(tf.pl)
 params!(tf::TakacsFiksel, θ::Vector{Float64}) = params!(tf.pl, θ)

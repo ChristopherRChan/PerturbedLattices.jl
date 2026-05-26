@@ -13,6 +13,11 @@ println("Starting warmup ...")
 @time rand!(pl,NMC=1000000)
 
 tf = TakacsFiksel(pl, 15)
+fit!(tf, [1.0, 2.])
+tf
+
+
+### test
 dim(tf)
 tf.f
 points(tf.gridQ)
