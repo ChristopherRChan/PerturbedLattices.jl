@@ -17,10 +17,11 @@ function Base.show(io::IO, m::GaussianMove)
     print(io, "GaussianMove(σ²=$(θ(m)[1]), d=$(m.d))")
 end
 
+# param is 1/σ² = σ⁻²
 nbparam(m::GaussianMove) = 1
-params(m::GaussianMove) = [m.Σ[1,1]]
-params!(m::GaussianMove, σ²::Float64) = m.Σ[diagind(m.Σ)] .= σ²
-params!(m::GaussianMove, θ::Vector{Float64}) = params!(m,θ[1])
+params(m::GaussianMove) = [1 / m.Σ[1,1]]
+params!(m::GaussianMove, σ⁻²::Float64) = m.Σ[diagind(m.Σ)] .= σ⁻²
+params!(m::GaussianMove, θ::Vector{Float64}) = params!(m,1/θ[1])
 
 
 function Base.rand(rng::AbstractRNG, model::GaussianMove)

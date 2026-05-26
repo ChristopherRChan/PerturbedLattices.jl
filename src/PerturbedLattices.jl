@@ -15,9 +15,10 @@ export lattice, points
 export TakacsFiksel
 export rand!
 export plot 
-export θ, nθ
+export θ, nθ, θ!
 export dim
 export hγ, d²
+export fit!
 
 # Core types
 export PerturbedLatticeV1

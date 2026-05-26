@@ -10,7 +10,7 @@ pl = PerturbedLatticeModel(h, move, (20, 2))
 
 ## Warmup phase
 println("Starting warmup ...")
-@time rand!(pl)
+@time rand!(pl,NMC=1000000)
 
 tf = TakacsFiksel(pl, 15)
 dim(tf)
@@ -18,6 +18,11 @@ tf.f
 points(tf.gridQ)
 points(tf)
 
+θ!(tf, tf.pl.θ)
+θ(tf)
+PerturbedLattices.contrast(tf)
+PerturbedLattices.contrast(tf, [1.0, 0.01])
+fit!(tf)
 tf.fcache
 tf.ΣfΛcache
 tf.ΣfΛcache[1, : , :]
