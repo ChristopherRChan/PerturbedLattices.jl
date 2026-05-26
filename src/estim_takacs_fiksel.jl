@@ -104,10 +104,6 @@ function update!(tf::TakacsFiksel; f::Vector{Function}=Function[], radius::Int=t
     end
 end
 
-function Σf_ΣΣfΛ(tf::TakacsFiksel) 
-    []
-end
-
 contrast(tf::TakacsFiksel) = sum(
     (
         transpose(fill(1.0, length(tf.subind))) * 
