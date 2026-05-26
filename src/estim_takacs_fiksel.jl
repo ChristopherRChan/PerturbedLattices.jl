@@ -25,14 +25,28 @@ mutable struct TakacsFiksel <: EstimationMethod
     fcache::Matrix{Float64}     # config cache for left term of DLR
     ΣfΛcache::Array{Float64}   # grid cache for right term of DLR
     gridQ::Grid
+    subind::Array{Int}
 end
 
-function TakacsFiksel(pl::PerturbedLatticeModel, radius::Int; f::Vector{Function}=Function[], gridQ::Grid=Grid(2,2))
+function TakacsFiksel(pl::PerturbedLatticeModel, radius::Int; f::Vector{Function}=Function[], nQ::Int=5, ρQ::Float64=1.5)
     θ = zeros(Float64, nbparam(pl))
-    tf = TakacsFiksel(pl, radius, f, θ, zeros(0, 0), zeros(0, 0), gridQ)
+    # grid for approx integral on Q
+    d = dim(pl)
+    gridQ = Grid(nQ , d)
+    δ = ρQ / nQ
+    scale!(gridQ, δ)
+    subind = lattice(pl).ind[repeat([-radius:radius],d)...]
+    tf = TakacsFiksel(pl, radius, f, θ, zeros(0, 0), zeros(0, 0), gridQ, subind)
     init!(tf)
+    cache!(tf)
     return tf
 end
+
+nbparam(tf::TakacsFiksel) = nbparam(tf.pl)
+params(tf::TakacsFiksel) = params(tf.pl)
+params!(tf::TakacsFiksel, θ::Vector{Float64}) = params!(tf.pl, θ)
+
+points(tf::TakacsFiksel) = points(tf.pl)
 
 # Todo: define TakacsFiksel for estimation from pointset
 # or define fit(PerturbedLatticeModel, ...) which first define TakacsFiksel object to estimate parameters
@@ -51,26 +65,21 @@ function init!(tf::TakacsFiksel)
     end
 end
 
-function cache!(tf::TakacsFiksel; nQ::Int=5, ρQ::Float64=1.5)
-    d = tf.pl.pointset.lattice.d
-    subind = lattice(tf.pl).ind[repeat([-tf.radius:tf.radius],d)...]
-    
+function cache!(tf::TakacsFiksel)
     # left cache
-    tf.fcache = Matrix{Float64}(undef, length(subind), length(tf.f))
+    tf.fcache = Matrix{Float64}(undef, length(tf.subind), length(tf.f))
     pts = points(tf.pl)
-    for (i, si) in enumerate(subind) # si is the index in the subgrid
+    for (i, si) in enumerate(tf.subind) # si is the index in the subgrid
         for l in eachindex(tf.f)
             tf.fcache[i, l] = tf.f[l](si, pts[si], tf.pl)
         end
     end 
 
     # right cache
-    tf.gridQ = Grid(nQ , d)
-    δ = ρQ / nQ
-    scale!(tf.gridQ, δ)
-    tf.ΣfΛcache = Array{Float64}(undef, length(subind), length(tf.gridQ) ,length(tf.f))
+    
+    tf.ΣfΛcache = Array{Float64}(undef, length(tf.subind), length(tf.gridQ) ,length(tf.f))
     lpts = points(lattice(tf.pl))
-    for (i, si) in enumerate(subind)
+    for (i, si) in enumerate(tf.subind)
         for k in eachindex(points(tf.gridQ))
             pt = lpts[si] .+ tf.gridQ[k]
             for l in eachindex(tf.f)

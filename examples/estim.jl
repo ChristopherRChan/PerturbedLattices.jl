@@ -15,12 +15,27 @@ println("Starting warmup ...")
 tf = TakacsFiksel(pl, 15)
 dim(tf)
 tf.f
-PerturbedLattices.cache!(tf)
 points(tf.gridQ)
+points(tf)
 
 tf.fcache
 tf.ΣfΛcache
-tf.ΣfΛcache[lattice(tf.pl).ind[841], : , 2]
+tf.ΣfΛcache[1, : , :]
+lattice(tf.pl).ind[841]
+θ(tf)
+
+# left
+tf.fcache
+# right
+transpose(fill(1.0, length(tf.gridQ))) * exp.(-tf.ΣfΛcache[1, : , :]  * θ(tf))
+sum(exp.(-tf.ΣfΛcache[1, : , :]  * θ(tf)))
+exp.(-tf.ΣfΛcache[1, : , :]  * θ(tf)) .* tf.ΣfΛcache[1, : , :]
+collect(transpose(fill(1.0, length(tf.gridQ))) * (exp.(-tf.ΣfΛcache[1, : , :]  * θ(tf)) .* tf.ΣfΛcache[1, : , :]) / sum(exp.(-tf.ΣfΛcache[1, : , :]  * θ(tf))))
+
+
+vcat([collect(transpose(fill(1.0, length(tf.gridQ))) * (exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , :]) / sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)))) for i=eachindex(tf.subind)]...)
+
+sum(transpose(fill(1.0, length(tf.subind))) * (tf.fcache - vcat([collect(transpose(fill(1.0, length(tf.gridQ))) * (exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , :]) / sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)))) for i=eachindex(tf.subind)]...)) .^2)
 
 #################################################
 ### Devel of TakacsFiksel
