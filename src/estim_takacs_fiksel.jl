@@ -114,9 +114,26 @@ contrast(tf::TakacsFiksel) = sum(
     ) .^2
 )
 
+function contrast(tf::TakacsFiksel,::Type{Vector})
+    res = zeros(length(tf.f))
+    for i=eachindex(tf.subind)
+        for l=eachindex(tf.f)
+            res[l] += tf.fcache[i, l] 
+            ΣS, Σ = 0.0, 0.0
+            for k=eachindex(points(tf.gridQ))
+                tmp = sum(exp.(-tf.ΣfΛcache[i, k , :]'  * θ(tf)))
+                Σ += tmp
+                ΣS += tmp * tf.ΣfΛcache[i, k , l]
+            end
+            res[l] -= ΣS / Σ
+        end
+    end
+    return sum((res ./ length(tf.subind)) .^2)
+end
+
 function contrast(tf::TakacsFiksel, θ::Vector{Float64})
     θ!(tf, θ)
-    return contrast(tf)
+    return contrast(tf) #, Vector)
 end
 
 function fit!(tf::TakacsFiksel, θ₀::Vector{Float64} = θ(tf))

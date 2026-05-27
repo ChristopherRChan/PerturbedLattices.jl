@@ -15,8 +15,8 @@ println("Starting warmup ...")
 tf = TakacsFiksel(pl, 15)
 fit!(tf, [1.0, 2.])
 tf
-
-
+PerturbedLattices.contrast(tf)
+PerturbedLattices.contrast(tf, Vector)
 ### test
 dim(tf)
 tf.f
