@@ -109,7 +109,7 @@ contrast(tf::TakacsFiksel) = sum(
         transpose(fill(1.0, length(tf.subind))) * 
             (
                 tf.fcache -  
-                    [ sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , l]) ./ sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)))  for i=eachindex(tf.subind), l=eachindex(tf.f) ]
+                    [ sum((exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , l])) / sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf))) for i=eachindex(tf.subind), l=eachindex(tf.f)]
             ) / length(tf.subind)
     ) .^2
 )

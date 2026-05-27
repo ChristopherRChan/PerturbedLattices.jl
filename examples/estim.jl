@@ -34,9 +34,17 @@ tf.ΣfΛcache
 tf.ΣfΛcache[1, : , :]
 lattice(tf.pl).ind[841]
 θ(tf)
+
+tf.fcache - [ sum((exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , l])) / sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf))) for i=eachindex(tf.subind), l=eachindex(tf.f)]
+
+[ (transpose(fill(1.0, length(tf.subind))) * exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , l]) ./ sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)))  for i=eachindex(tf.subind), l=eachindex(tf.f) ]
+
+
+
 transpose(fill(1.0, length(tf.subind))) * 
     (
-        tf.fcache -  [ sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , l]) ./ sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)))  for i=eachindex(tf.subind), l=eachindex(tf.f) ]
+        tf.fcache - [ sum((exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , l])) / sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf))) for i=eachindex(tf.subind), l=eachindex(tf.f)]
+        #tf.fcache -  [ sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , l]) ./ sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)))  for i=eachindex(tf.subind), l=eachindex(tf.f) ]
     ) / length(tf.subind)
 
 sum(
