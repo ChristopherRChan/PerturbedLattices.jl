@@ -50,6 +50,7 @@ function init!(g::Grid)
 
 end
 
+scale!(g::Grid, scale::Float64) = g.points .*= scale
 
 # SubGrid is just a grid with SubGrid.radius < Grid.radius
 

@@ -57,10 +57,10 @@ function DLR_W(pl::PerturbedLatticeV1, points_D_n::Vector{Vector{Float64}}, grid
         denom = 0.0
         X_i = points_D_n[i] .- grid_D_n[i]
         for j in 1:N_est^2
-            x_i = grid_est[j]
-            if W_n[1,1] + pl.RS <= grid_D_n[i][1] + x_i[1] <= W_n[1,2] - pl.RS && W_n[2,1] + pl.RS <= grid_D_n[i][2] + x_i[2] <= W_n[2,2] - pl.RS
-                exp_term = exp(-theta*(x_i[1]^2 + x_i[2]^2) / 2)
-                num_1 += (x_i[1]^2 + x_i[2]^2)/2*exp(-beta*vec_loc_en_W[i,j]) * exp_term 
+            x_j = grid_est[j]
+            if W_n[1,1] + pl.RS <= grid_D_n[i][1] + x_j[1] <= W_n[1,2] - pl.RS && W_n[2,1] + pl.RS <= grid_D_n[i][2] + x_j[2] <= W_n[2,2] - pl.RS
+                exp_term = exp(-theta*(x_j[1]^2 + x_j[2]^2) / 2)
+                num_1 += (x_j[1]^2 + x_j[2]^2)/2*exp(-beta*vec_loc_en_W[i,j]) * exp_term 
                 num_2 += vec_loc_en_W[i,j] * exp(-beta*vec_loc_en_W[i,j]) * exp_term
                 denom += exp(-beta*vec_loc_en_W[i,j]) * exp_term
             end
