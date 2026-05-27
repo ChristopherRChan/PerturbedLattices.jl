@@ -57,12 +57,12 @@ function init!(tf::TakacsFiksel)
     # int f
     tf.f = Function[]
     if nbparam(tf.pl.move) > 0
-        push!(tf.f, Base.Fix{1}(fₗ,tf.pl.move))
+        push!(tf.f, Base.Fix1(fₗ,tf.pl.move))
     end
     hs = tf.pl.h isa HamiltonianFamily ? tf.pl.h.hs : [tf.pl.h]
     for h in hs
        if nbparam(h) > 0
-            push!(tf.f, Base.Fix{1}(fₗ,h))
+            push!(tf.f, Base.Fix1(fₗ,h))
         end
     end
 end
@@ -138,7 +138,7 @@ end
 
 function fit!(tf::TakacsFiksel, θ₀::Vector{Float64} = θ(tf))
     θ!(tf, θ₀) 
-    result = optimize(Base.Fix{1}(contrast, tf), θ₀, NelderMead())
+    result = optimize(Base.Fix1(contrast, tf), θ₀, NelderMead())
     tf.θ = Optim.minimizer(result)
     result
 end
