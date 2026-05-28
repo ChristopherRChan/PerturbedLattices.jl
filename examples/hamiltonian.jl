@@ -1,5 +1,8 @@
 using PerturbedLattices
 
+h = MultiStraussHamiltonian([1.0,-2.0], [0.0,1.0,2.0], Grid(20,2))
+hγ(h, 1)
+
 h = StraussHamiltonian(2.0, 1.5, Grid(20, 2))
 
 hc = HardCoreHamiltonian(0.5, Grid(20, 2))

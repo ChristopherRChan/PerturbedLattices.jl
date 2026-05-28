@@ -9,7 +9,7 @@ using OffsetArrays
 
 export PerturbedLatticeModel
 export PointSet, Grid
-export StraussHamiltonian, HardCoreHamiltonian
+export MultiStraussHamiltonian, StraussHamiltonian, HardCoreHamiltonian
 export GaussianMove, UniformMove
 export lattice, points
 export TakacsFiksel

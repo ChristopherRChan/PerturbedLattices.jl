@@ -38,7 +38,6 @@ function TakacsFiksel(pl::PerturbedLatticeModel, radius::Int; f::Vector{Function
     subind = lattice(pl).ind[repeat([-radius:radius],d)...]
     tf = TakacsFiksel(pl, radius, f, θ, zeros(0, 0), zeros(0, 0), gridQ, subind)
     init!(tf)
-    cache!(tf)
     return tf
 end
 
@@ -105,7 +104,7 @@ contrast(tf::TakacsFiksel) = sum(
         transpose(fill(1.0, length(tf.subind))) * 
             (
                 tf.fcache -  
-                    [ sum((exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , l])) / sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf))) for i=eachindex(tf.subind), l=eachindex(tf.f)]
+                    [ sum((exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , l])) / sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf))) for i=eachindex(tf.subind), l=eachindex(θ(tf))]
             ) / length(tf.subind)
     ) .^2
 )
@@ -113,7 +112,7 @@ contrast(tf::TakacsFiksel) = sum(
 function contrast(tf::TakacsFiksel,::Type{Vector})
     res = zeros(length(tf.f))
     for i=eachindex(tf.subind)
-        for l=eachindex(tf.f)
+        for l=eachindex(θ(tf))
             res[l] += tf.fcache[i, l] 
             ΣS, Σ = 0.0, 0.0
             for k=eachindex(points(tf.gridQ))
@@ -133,6 +132,7 @@ function contrast(tf::TakacsFiksel, θ::Vector{Float64})
 end
 
 function fit!(tf::TakacsFiksel, θ₀::Vector{Float64} = θ(tf))
+    cache!(tf)
     θ!(tf, θ₀) 
     result = optimize(Base.Fix1(contrast, tf), θ₀, NelderMead())
     tf.θ = Optim.minimizer(result)

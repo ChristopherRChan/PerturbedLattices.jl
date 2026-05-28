@@ -44,6 +44,7 @@ function params!(pl, θ::Vector{Float64})
     if nbparam(pl.h) > 0
         params!(pl.h, θ[1 + nbparam(pl.move):nbparam(pl)])
     end
+    params(pl)
 end
 
 Base.length(pl::PerturbedLatticeModel) = length(pl.pointset.lattice)
