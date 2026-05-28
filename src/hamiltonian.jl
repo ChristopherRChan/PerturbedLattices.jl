@@ -1,5 +1,10 @@
-struct HamiltonianFamily <: AbstractHamiltonian
-    hs::Vector{AbstractHamiltonian}
+function pointset!(h::AbstractHamiltonian, ps::AbstractPointSet)
+    h.pointset = convert(PointSet, ps)
+    update!(h.pointset)
+end
+
+struct HamiltonianFamily <: ExponentialFamilyHamiltonian
+    hs::Vector{ExponentialFamilyHamiltonian}
 end
 
 nbparam(h::HamiltonianFamily) = sum([nbparam(h_) for h_=h.hs])
@@ -14,7 +19,36 @@ function params!(h::HamiltonianFamily, θ::Vector{Float64})
     end
 end
 
-mutable struct StraussHamiltonian <: AbstractHamiltonian
+mutable struct MultiStraussHamiltonian <: ExponentialFamilyHamiltonian
+    β::Vector{Float64}
+    ρ²::Vector{Float64} # ρ²[1]=HC and ρ²[end]=Range (length(ρ²) = length(β) + 1)
+    # field required for AbstractHamiltonian
+    pointset::AbstractPointSet
+    MultiStraussHamiltonian(β::Vector{Float64}, ρ::Vector{Float64}) = new(β, ρ.^2)
+end
+
+MultiStraussHamiltonian(;β::Float64, ρ::Float64) = MultiStraussHamiltonian(β, ρ)
+
+function Base.show(io::IO, h::MultiStraussHamiltonian)
+    print(io, "MultiStrauss(h(d)=")
+    if h.ρ²[1] > 0
+        print(io, "(∞) × I_[0,$(h.ρ²[1])](d)")
+        if length(h.ρ²) > 1
+            print(io, " + ")
+        end
+    end
+    if length(h.ρ²) > 1
+        print(io, join(["$(h.β[i])× I_[$(h.ρ²[i]),$(h.ρ²[i+1])](d)" for i=eachindex(h.β)], " * "))
+    end
+    print(io, ")")
+end
+
+nbparam(h::MultiStraussHamiltonian) = length(h.β)
+params(h::MultiStraussHamiltonian) = h.β
+params!(h::MultiStraussHamiltonian, β::Vector{Float64}) = h.β = β
+
+
+mutable struct StraussHamiltonian <: ExponentialFamilyHamiltonian
     β::Float64
     ρ²::Float64 
     # field required for AbstractHamiltonian
@@ -30,10 +64,10 @@ end
 
 StraussHamiltonian(;β::Float64, ρ::Float64) = StraussHamiltonian(β, ρ)
 
-Base.show(io::IO, sh::StraussHamiltonian) = print(io, "Strauss(β=$(sh.β), ρ²=$(sh.ρ²)")
+Base.show(io::IO, sh::StraussHamiltonian) = print(io, "Strauss(h(d)=$(sh.β)× I_[0,$(sh.ρ²)](d)")
 
 nbparam(sh::StraussHamiltonian) = 1
-params(sh::StraussHamiltonian) = sh.β
+params(sh::StraussHamiltonian) = [sh.β]
 params!(sh::StraussHamiltonian, β::Float64) = sh.β = β
 params!(sh::StraussHamiltonian, θ::Vector{Float64}) = params!(sh, θ[1])
 
@@ -55,25 +89,18 @@ end
 nbparam(hc::HardCoreHamiltonian) = 0
 params(::HardCoreHamiltonian) = []
 
-function pointset!(sh::StraussHamiltonian, ps::AbstractPointSet)
-    sh.pointset = convert(PointSet, ps)
-    update!(sh.pointset)
-end
-
-function pointset!(hch::HardCoreHamiltonian, ps::AbstractPointSet)
-    hch.pointset = convert(PointSet, ps)
-    update!(hch.pointset)
-end
-
 
 S(h::StraussHamiltonian, i::Int) = Σd²(h.pointset, i, h.ρ²)
 S(h::StraussHamiltonian, i::Int, point::Point) = Σd²(h.pointset, i, point, h.ρ²)
+function S(h::MultiStraussHamiltonian, i::Int, point::Point)
+    Σd²(h.pointset, i, point, h.ρ²)
+end
 
 function localenergy end
 hγ = localenergy
 
-localenergy(h::StraussHamiltonian, i::Int) = h.β * S(h,i)
-localenergy(h::StraussHamiltonian, i::Int, point::Point) = h.β * S(h,i, point)
+localenergy(h::ExponentialFamilyHamiltonian, i::Int) = h.β * S(h,i)
+localenergy(h::ExponentialFamilyHamiltonian, i::Int, point::Point) = h.β * S(h,i, point)
 
 localenergy(h::HardCoreHamiltonian, i::Int) = any(d²(h.pointset,i) .<= h.ρ²) ? Inf : 0.0
 localenergy(h::HardCoreHamiltonian, i::Int, point::Point) = any(d²(h.pointset, i, point) .<= h.ρ²) ? Inf : 0.0

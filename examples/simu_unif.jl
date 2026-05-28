@@ -2,7 +2,7 @@ using PerturbedLattices
 
 
 h = StraussHamiltonian(-1.0, 1.3)
-move = UniformMove([[-0.5, 0.5], [-0.5, 0.5]])
+move = UniformMove(ρ=0.5, d=2)
 
 # Create the lattice
 pl = PerturbedLatticeModel(h, move, 20, 2)

@@ -2,7 +2,7 @@ using PerturbedLattices
 # using BenchmarkTools
 
 
-h = StraussHamiltonian(β=1.0, ρ=1.3)
+h = StraussHamiltonian(β=1.0, ρ=2.0)
 move = GaussianMove(σ²=0.5, d=2)
 
 # Create the lattice
@@ -10,14 +10,19 @@ pl = PerturbedLatticeModel(h, move, (20, 2))
 
 ## Warmup phase
 println("Starting warmup ...")
-@time rand!(pl,NMC=1000000)
+θ!(pl, [2,1.0])
+@time rand!(pl,NMC=100000)
 
 tf = TakacsFiksel(pl, 15)
-fit!(tf, [1.0, 2.])
+PerturbedLattices.cache!(tf)
+fit!(tf, [2.0, 2])
 tf
 @time PerturbedLattices.contrast(tf)
 @time PerturbedLattices.contrast(tf, Vector)
-### test
+
+
+### test for devel
+
 dim(tf)
 tf.f
 points(tf.gridQ)

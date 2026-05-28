@@ -19,7 +19,7 @@
 mutable struct TakacsFiksel <: EstimationMethod
     pl::PerturbedLatticeModel
     radius::Int                 # radius defining the inside grid compared with radius of pl.pointset
-    f::Vector{Function}
+    f::Vector{Function}         # f[l] returns Vector{Float64} corresponding to [fₗ(...) for l=1:nθ(pl.h)]
     # internally
     θ::Vector{Float64}          # final parameters at the end of estimation 
     fcache::Matrix{Float64}     # config cache for left term of DLR
@@ -69,24 +69,20 @@ end
 
 function cache!(tf::TakacsFiksel)
     # left cache
-    tf.fcache = Matrix{Float64}(undef, length(tf.subind), length(tf.f))
+    tf.fcache = Matrix{Float64}(undef, length(tf.subind), nθ(tf))
     pts = points(tf.pl)
     for (i, si) in enumerate(tf.subind) # si is the index in the subgrid
-        for l in eachindex(tf.f)
-            tf.fcache[i, l] = tf.f[l](si, pts[si], tf.pl)
-        end
+        tf.fcache[i, :] = vcat([tf.f[l](si, pts[si], tf.pl) for l in eachindex(tf.f)]...)
     end 
 
     # right cache
     
-    tf.ΣfΛcache = Array{Float64}(undef, length(tf.subind), length(tf.gridQ) ,length(tf.f))
+    tf.ΣfΛcache = Array{Float64}(undef, length(tf.subind), length(tf.gridQ) ,nθ(tf))
     lpts = points(lattice(tf.pl))
     for (i, si) in enumerate(tf.subind)
         for k in eachindex(points(tf.gridQ))
             pt = lpts[si] .+ tf.gridQ[k]
-            for l in eachindex(tf.f)
-                tf.ΣfΛcache[i, k, l] = tf.f[l](si, pt, tf.pl)
-            end 
+            tf.ΣfΛcache[i, k, :] = vcat([tf.f[l](si, pt, tf.pl) for l in eachindex(tf.f)]...)
         end
     end
 end
@@ -147,4 +143,5 @@ end
 # since Γ is initialized inside plΓ object
 fₗ(m::GaussianMove, i::Int, x::Point, plΓ::PerturbedLatticeModel) = sum((x .- points(lattice(plΓ))[i]).^2) / 2
 
-fₗ(h::StraussHamiltonian, i::Int, x::Point, plΓ::PerturbedLatticeModel) = S(h, i, x)
+fₗ(h::ExponentialFamilyHamiltonian, i::Int, x::Point, plΓ::PerturbedLatticeModel) = S(h, i, x)
+

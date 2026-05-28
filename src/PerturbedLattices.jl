@@ -48,7 +48,9 @@ points(ps::AbstractPoints) = ps.points
 abstract type AbstractPerturbedLatticeModel <: AbstractPoints end
 abstract type EstimationMethod end
 
+
 abstract type AbstractHamiltonian end
+abstract type ExponentialFamilyHamiltonian <: AbstractHamiltonian end
 abstract type AbstractMove end
 
 # Include submodules
