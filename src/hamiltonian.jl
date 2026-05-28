@@ -54,6 +54,33 @@ params(h::MultiStraussHamiltonian) = h.β
 params!(h::MultiStraussHamiltonian, β::Vector{Float64}) = h.β = β
 
 
+
+mutable struct LennardJonesHamiltonian <: ExponentialFamilyHamiltonian
+    β₁::Float64
+    β₂::Float64
+    d₁::Int
+    d₂::Int
+    R::Float64
+    # field required for AbstractHamiltonian
+    pointset::AbstractPointSet
+    LennardJonesHamiltonian(β₁::Float64, β₂::Float64; d₁::Int=6, d₂::Int=3, R::Float64=1.0) = new(β₁, β₂, d₁, d₂, R)
+end
+
+function LennardJonesHamiltonian(β₁::Float64, β₂::Float64, ps::AbstractPointSet; d₁::Int=12, d₂::Int=6, R::Float64=1.0)
+    h = LennardJonesHamiltonian(β₁, β₂, d₁=d₁, d₂=d₂, R=R)
+    pointset!(h, ps)
+    return h
+end
+
+function Base.show(io::IO, h::LennardJonesHamiltonian)
+    print(io, "LennardJones(h(d)=$(h.β₁)×($(h.R)/d²)^$(h.d₁)) - $(h.β₂)×($(h.R)/d²)^$(h.d₂)))")
+end
+
+nbparam(h::LennardJonesHamiltonian) = 2
+params(h::LennardJonesHamiltonian) = [h.β₁, h.β₂]
+params!(h::LennardJonesHamiltonian, β::Vector{Float64}) = (h.β₁, h.β₂) = β
+
+
 mutable struct StraussHamiltonian <: ExponentialFamilyHamiltonian
     β::Float64
     ρ²::Float64 
@@ -98,17 +125,24 @@ params(::HardCoreHamiltonian) = []
 
 S(h::StraussHamiltonian, i::Int) = Σd²(h.pointset, i, h.ρ²)
 S(h::StraussHamiltonian, i::Int, point::Point) = Σd²(h.pointset, i, point, h.ρ²)
+
 function S(h::MultiStraussHamiltonian, i::Int, point::Point)
     s = [Σd²(h.pointset, i, point, ρ²) for ρ²=h.ρ²]
     return s[2:end] .- s[1:end-1]
 end
 S(h::MultiStraussHamiltonian, i::Int) = S(h, i, h.pointset[i])
 
+function S(h::LennardJonesHamiltonian, i::Int, point::Point)
+    [sum((h.R ./ (filter((!=)(0), d²(h.pointset, i, point))) .^ h.d₁)), -sum(h.R ./filter((!=)(0), d²(h.pointset, i, point)) .^ h.d₂)]
+end
+S(h::LennardJonesHamiltonian, i::Int) = S(h, i, h.pointset[i])
+
+
 function localenergy end
 hγ = localenergy
 
-localenergy(h::ExponentialFamilyHamiltonian, i::Int) = sum(h.β .* S(h,i))
-localenergy(h::ExponentialFamilyHamiltonian, i::Int, point::Point) = sum(S(h,i, point) .* h.β) 
+localenergy(h::ExponentialFamilyHamiltonian, i::Int) = sum(θ(h) .* S(h,i))
+localenergy(h::ExponentialFamilyHamiltonian, i::Int, point::Point) = sum(S(h,i, point) .* θ(h)) 
 
 localenergy(h::HardCoreHamiltonian, i::Int) = any(d²(h.pointset,i) .<= h.ρ²) ? Inf : 0.0
 localenergy(h::HardCoreHamiltonian, i::Int, point::Point) = any(d²(h.pointset, i, point) .<= h.ρ²) ? Inf : 0.0
