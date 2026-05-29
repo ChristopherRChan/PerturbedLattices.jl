@@ -7,3 +7,4 @@ convert(PointSet, ps)
 move = GaussianMove([0.5 0.; 0. 0.5])
 
 rand!(ps, move)
+plot(ps,radius=3)

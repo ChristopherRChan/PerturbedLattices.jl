@@ -23,6 +23,9 @@ function PointSet(radius::Int, d::Int) # radius et d définissent la fenêtre d'
     return PointSet(g, points)
 end
 
+lattice(ps::PointSet) = ps.lattice
+index(ps::PointSet) = index(lattice(ps))
+
 Base.convert(::Type{PointSet}, g::Grid) = PointSet(g.radius, g.d)
 
 function d²!(ps::PointSet)
@@ -63,7 +66,8 @@ function d²(ps::PointSet, i::Int, point::Point)
     end
     return d²_
 end
-Σd²(ps::PointSet, i::Int, point::Point, ρ²::Float64) = sum(d²(ps,i, point) .<= ρ²)
+
+Σd²(ps::PointSet, i::Int, point::Point, ρ²::Float64) = (ρ² == 0.0 ? 0 : sum(d²(ps,i, point) .<= ρ²))
 
 # iₒ is the index of grid point not considered
 d²(ps::PointSet, i::Int, iₒ::Int) = (ps.d²[i,k] for k=eachindex(ps.d²[i,:]) if k ≠ iₒ)
@@ -87,8 +91,3 @@ function revert!(ps::PointSet, i::Int)
    # revert square distance matrix for ith old point
    ps.d²[i, :] = ps.d²[:, i] = ps.old_d²
 end
-
-
-points(ps::PointSet) = ps.points
-
-lattice(ps::PointSet) = ps.lattice

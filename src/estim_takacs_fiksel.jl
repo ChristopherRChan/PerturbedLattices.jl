@@ -143,5 +143,5 @@ end
 # since Γ is initialized inside plΓ object
 fₗ(m::GaussianMove, i::Int, x::Point, plΓ::PerturbedLatticeModel) = sum((x .- points(lattice(plΓ))[i]).^2) / 2
 
-fₗ(h::ExponentialFamilyHamiltonian, i::Int, x::Point, plΓ::PerturbedLatticeModel) = S(h, i, x)
+fₗ(h::ExponentialFamilyHamiltonian, i::Int, x::Point, plΓ::PerturbedLatticeModel) = S(h, i, x, plΓ)
 

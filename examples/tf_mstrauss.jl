@@ -16,13 +16,3 @@ tf = TakacsFiksel(pl, 15, nQ=5, ρQ=3.0)
 @time rand!(pl,NMC=100000)
 fit!(tf, [1.0, .2, .2])
 tf
-
-# sum(
-#     (
-#         transpose(fill(1.0, length(tf.subind))) * 
-#             (
-#                 tf.fcache -  
-#                     [ sum((exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf)) .* tf.ΣfΛcache[i, : , l])) / sum(exp.(-tf.ΣfΛcache[i, : , :]  * θ(tf))) for i=eachindex(tf.subind), l=eachindex(θ(tf))]
-#             ) / length(tf.subind)
-#     ) .^2
-# )

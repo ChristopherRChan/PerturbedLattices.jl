@@ -1,7 +1,7 @@
-function RecipesBase.plot(pl::PerturbedLatticeModel; radius::Number = pl.pointset.lattice.radius, arrow=true)
+function RecipesBase.plot(pl::AbstractPointSet; radius::Number = lattice(pl).radius, arrow=true)
     lpts, pts = points(lattice(pl)), points(pl)
-    window = repeat(Float64[-radius radius], pl.pointset.lattice.d)
-    if lattice(pl).d == 2
+    window = repeat(Float64[-radius radius], dim(pl))
+    if dim(pl) == 2
         lattice_x = [p[1] for p in lpts]
         lattice_y = [p[2] for p in lpts]
         points_x = [p[1] for p in pts]
@@ -28,7 +28,7 @@ function RecipesBase.plot(pl::PerturbedLatticeModel; radius::Number = pl.pointse
         plot!(aspect_ratio=:equal)
 
         return p
-    elseif pl.lattice.d == 3
+    elseif dim(pl) == 3
         lattice_x = [p[1] for p in lpts]
         lattice_y = [p[2] for p in lpts]
         lattice_z = [p[3] for p in lpts]

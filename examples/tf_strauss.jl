@@ -3,21 +3,72 @@ using PerturbedLattices
 
 
 h = StraussHamiltonian(β=1.0, ρ=2.0)
+hM = MultiStraussHamiltonian([1.0], [0, 2.0])
 move = GaussianMove(σ²=0.5, d=2)
 
 # Create the lattice
 pl = PerturbedLatticeModel(h, move, (20, 2))
+plM = PerturbedLatticeModel(hM, move, (20, 2))
 
 # create TF estimation
 tf = TakacsFiksel(pl, 15, nQ=10, ρQ=3.0)
+tfM = TakacsFiksel(plM, 15, nQ=10, ρQ=3.0)
 
 ## Repeat these 4 lines to have new estimation
 θ!(pl, [2,1.0])
+rand!(pl.pointset, pl.move)
+plot(pl, radius=3)
 @time rand!(pl,NMC=100000)
+plot(pl, radius=3)
+fit!(tf, [2.0, 2])
+tf
+points!(plM, pl)
+plot(plM, radius=3)
+fit!(tfM, [2.0, 2])
+tfM
+θ(tfM)
+
+tfM.fcache
+tf.fcache
+
+θ!(plM, [2,1.0])
+θ!(pl, [2,1.0])
+tfM.subind == tf.subind
+ptsM = points(tfM.pl) 
+pts = points(tf.pl)
+ptsM == pts
+si = tf.subind[1]
+vcat([tfM.f[2](si, ptsM[si], tfM.pl) for l in eachindex(tfM.f)]...)
+vcat([tf.f[2](si, pts[si], tf.pl) for l in eachindex(tf.f)]...)
+pts[si] == ptsM[si]
+tfM.pl.h
+tf.pl.h
+PerturbedLattices.S(tfM.pl.h, si, ptsM[si], plM)
+PerturbedLattices.S(tf.pl.h, si, pts[si], pl)
+d2M=d²(tfM.pl.pointset, si, pts[si])
+d2=d²(tf.pl.pointset, si, pts[si])
+s = [PerturbedLattices.Σd²(tfM.pl.pointset, si, pts[si], ρ²) for ρ²=tfM.pl.h.ρ²]
+s[2:end] .- s[1:end-1]
+points(tfM.pl)
+
+
+### the opposite
+θ!(plM, [2,1.0])
+rand!(plM.pointset, plM.move)
+plot(plM, radius=3)
+@time rand!(plM,NMC=100000)
+plot(plM, radius=3)
+fit!(tfM, [2.0, 2])
+tfM
+points!(pl, plM)
+plot(pl, radius=3)
 fit!(tf, [2.0, 2])
 tf
 
+tfM.fcache
+tf.fcache
 
+2
 ###
 # @time PerturbedLattices.contrast(tf)
 # @time PerturbedLattices.contrast(tf, Vector)

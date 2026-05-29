@@ -4,7 +4,6 @@ struct Grid <: AbstractLattice
     points::Points
     ind::OffsetArray{Int}
 
-    
     function Grid(radius::Int, d::Int)
         li = OffsetArray{Int}(LinearIndices(tuple(repeat([2radius+1],d)...)), tuple(repeat([-radius:radius],d)...))
         gr = new(radius, d, Points(undef, (2*radius+1)^d), li)
@@ -26,6 +25,7 @@ function Base.size(g::Grid)
 end
 
 dim(g::Grid) = g.d
+index(g::Grid) = g.ind
 
 function init!(g::Grid)
     l = length(g)

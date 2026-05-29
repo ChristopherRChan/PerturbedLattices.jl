@@ -57,7 +57,7 @@ function Base.rand(rng::AbstractRNG, model::UniformMove)
 end
 
 function Random.rand!(rng::AbstractRNG, ps::PointSet, model::AbstractMove)
-    ps.points = [Base.rand(rng, model) for _ in eachindex(ps.lattice.points)]
+    ps.points = [pt .+ Base.rand(rng, model) for pt in points(ps)]
 end
 
 # rand for PointSet
