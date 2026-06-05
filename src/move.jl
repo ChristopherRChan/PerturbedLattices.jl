@@ -39,8 +39,14 @@ mutable struct UniformMove <: AbstractMove
     end
 end
 
+UniformMove(ρ::Float64, d::Int) = UniformMove(repeat([[-ρ, ρ]],d))
+UniformMove(;ρ::Float64, d::Int) = UniformMove(ρ, d)
+
 function Base.show(io::IO, m::UniformMove)
     print(io, "Uniform([$(m.bounds[1][1]), $(m.bounds[1][2])]×[$(m.bounds[2][1]), $(m.bounds[2][2])]")
+    if m.d==3
+        print(io, "×[$(m.bounds[3][1]), $(m.bounds[3][2])]")
+    end
 end
 
 nbparam(m::UniformMove) = 0
@@ -51,7 +57,7 @@ function Base.rand(rng::AbstractRNG, model::UniformMove)
 end
 
 function Random.rand!(rng::AbstractRNG, ps::PointSet, model::AbstractMove)
-    ps.points = [Base.rand(rng, model) for _ in eachindex(ps.lattice.points)]
+    ps.points = [pt .+ Base.rand(rng, model) for pt in points(ps)]
 end
 
 # rand for PointSet

@@ -9,9 +9,9 @@ using OffsetArrays
 
 export PerturbedLatticeModel
 export PointSet, Grid
-export StraussHamiltonian, HardCoreHamiltonian
+export MultiStraussHamiltonian, LennardJonesHamiltonian, StraussHamiltonian, HardCoreHamiltonian
 export GaussianMove, UniformMove
-export lattice, points
+export lattice, points, points!
 export TakacsFiksel
 export rand!
 export plot 
@@ -34,22 +34,27 @@ const Point = Vector{Float64}
 const Points = Vector{Point}
 # const OffsetPoints = OffsetArray{Point}
 
-abstract type AbstractPoints end # has a field points of type Points and 
-Base.getindex(p::AbstractPoints, i) = Base.getindex(p.points, i)
-Base.getindex(p::AbstractPoints, i, j...) = Base.getindex(p.points, p.ind[i, j...])
-Base.setindex!(p::AbstractPoints, v, i) = Base.setindex!(p.points, v, i)
-Base.setindex!(p::AbstractPoints, v, i, j...) = Base.setindex!(p.points, v, p.ind[i, j...])
+abstract type AbstractPoints end # has a method points  and a method index for possible negative coordinates
+Base.getindex(p::AbstractPoints, i) = Base.getindex(points(p), i)
+Base.getindex(p::AbstractPoints, i, j...) = Base.getindex(points(p), index(p)[i, j...])
+Base.setindex!(p::AbstractPoints, v, i) = Base.setindex!(points(p), v, i)
+Base.setindex!(p::AbstractPoints, v, i, j...) = Base.setindex!(points(p), v, index(p)[i, j...])
 
-abstract type AbstractPointSet <: AbstractPoints end 
+abstract type AbstractPointSet <: AbstractPoints end # has a field points
+points(ps::AbstractPointSet) = ps.points
+points!(ps::AbstractPointSet, points::Points) = ps.points = points
+points!(ps::AbstractPointSet, ps2::AbstractPoints) = points!(ps, points(ps2))
+
 abstract type AbstractLattice <: AbstractPointSet end
 
-points(ps::AbstractPoints) = ps.points
-
-abstract type AbstractPerturbedLatticeModel <: AbstractPoints end
+abstract type AbstractPerturbedLatticeModel <: AbstractPointSet end
 abstract type EstimationMethod end
 
-abstract type AbstractHamiltonian end
+
+abstract type AbstractHamiltonian <: AbstractPointSet end
+abstract type ExponentialFamilyHamiltonian <: AbstractHamiltonian end
 abstract type AbstractMove end
+points(h::AbstractHamiltonian) = points(h.pointset)
 
 # Include submodules
 include("dim.jl")

@@ -1,16 +1,19 @@
 using PerturbedLattices
 
-h = StraussHamiltonian(2.0, 1.5, Grid(20, 2))
+hMS = MultiStraussHamiltonian([1.0,-2.0], [0.0,1.0,2.0])
+hγ(hMS, 1, PointSet(20,2))
 
-hc = HardCoreHamiltonian(0.5, Grid(20, 2))
-h.pointset
-d²(h.pointset)
-hγ(h, 1)
+hLJ = LennardJonesHamiltonian(1.0, 1.0)
+hγ(hLJ, 1, [1.1, 2.1], PointSet(20,2))
+PerturbedLattices.S(hLJ, 1, [1.1, 2.1], PointSet(20,2))
 
-# constructor without lattice at creation
-h2 = StraussHamiltonian(1.0, 1.5)
-# lattice initialized after creation
-PerturbedLattices.pointset!(h2, Grid(20,2))
-h2
+hS = StraussHamiltonian(2.0, 1.5)
+hγ(hS, 2, PointSet(20,2))
+hγ(hS, 2, [1.1,2.1], PointSet(20,2))
+PerturbedLattices.S(hS, 2, [1.1,2.1], PointSet(20,2))
+hM = MultiStraussHamiltonian([2.0], [0,1.5])
+hγ(hM, 2, PointSet(20,2))
+hγ(hM, 2, [1.1,2.1], PointSet(20,2))
+PerturbedLattices.S(hM, 2, [1.1,2.1], PointSet(20,2))
 
-dim(h2)
+hc = HardCoreHamiltonian(0.5)

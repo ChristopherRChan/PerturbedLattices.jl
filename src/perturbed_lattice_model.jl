@@ -28,7 +28,6 @@ end
 
 function PerturbedLatticeModel(h::AbstractHamiltonian, move::AbstractMove, radius::Int = 20, d::Int=2)
     ps = PointSet(radius, d)
-    pointset!(h, ps)
     pl = PerturbedLatticeModel(h, move, ps)
     return pl
 end
@@ -44,6 +43,7 @@ function params!(pl, θ::Vector{Float64})
     if nbparam(pl.h) > 0
         params!(pl.h, θ[1 + nbparam(pl.move):nbparam(pl)])
     end
+    params(pl)
 end
 
 Base.length(pl::PerturbedLatticeModel) = length(pl.pointset.lattice)
@@ -53,20 +53,21 @@ function Base.show(io::IO, pl::PerturbedLatticeModel)
 end
 
 points(pl::PerturbedLatticeModel) = points(pl.pointset)
-points!(pl::PerturbedLatticeModel, points::Points) = pl.points = points
+points!(pl::PerturbedLatticeModel, points::Points) = pl.pointset.points = pl.points = points
 points!(pl::PerturbedLatticeModel, pointset::PointSet) = begin pl.pointset = pointset; pl.points = pointset.points; end
+points!(pl::PerturbedLatticeModel, pl2::PerturbedLatticeModel) = points!(pl, pl2.pointset)
 
 lattice(pl::PerturbedLatticeModel) = lattice(pl.pointset)
-
+index(pl::PerturbedLatticeModel) = index(lattice(pl))
 
 update!(pl::PerturbedLatticeModel) = update!(pl.pointset) 
 
 function move!(pl::AbstractPerturbedLatticeModel, i::Int, point::Point)
     # before move
-    old_en = hγ(pl.h, i)
+    old_en = hγ(pl.h, i, pl)
     # after move
     move!(pl.pointset, i, point)
-    new_en = hγ(pl.h, i)
+    new_en = hγ(pl.h, i, pl)
     return (new_en == Inf && old_en != Inf) ? 0.0 : exp(-(new_en - old_en))
 end
 
